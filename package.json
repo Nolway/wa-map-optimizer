@@ -8,6 +8,7 @@
     "license": "AGPL-3.0",
     "scripts": {
         "prepare": "husky install",
+        "build": "tsc --build",
         "lint": "eslint --ext .js,.ts .",
         "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
         "dev": "ts-node ./example/index.ts"

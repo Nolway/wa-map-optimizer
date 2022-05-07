@@ -131,6 +131,14 @@ async function optimizeNewTile(
     if (tileData.animation) {
         newTileData.animation = [];
         for (const frame of tileData.animation) {
+            if (frame.tileid === 0) {
+                newTileData.animation.push({
+                    duration: frame.duration,
+                    tileid: 0,
+                });
+                continue;
+            }
+
             let newFrameTileId: number;
             const existantNewFrameTileId = optimizedTiles.get(frame.tileid);
 

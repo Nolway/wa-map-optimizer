@@ -14,7 +14,7 @@ export const isMapTilesetTileAnimation = z.object({
 
 export const isMapTilesetTile = z.object({
     animation: isMapTilesetTileAnimation.array().optional(),
-    id: z.number().positive(),
+    id: z.number(),
     properties: isProperty.passthrough().array().optional(),
 });
 

@@ -1,7 +1,7 @@
 {
     "name": "wa-map-optimizer",
     "version": "1.0.0",
-    "description": "Tiled JSON Optimizer",
+    "description": "WorkAdventure Map Optimizer! Does your map need a diet?",
     "main": "./dist/index.js",
     "repository": "https://github.com/nolway/wa-map-optimizer",
     "author": "Nolway (Alexis Faizeau)",

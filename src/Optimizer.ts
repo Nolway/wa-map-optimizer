@@ -24,12 +24,13 @@ export class Optimizer {
         this.optimizedMap = map;
         this.optimizedTiles = new Map<number, number>();
         this.optimizedTilesets = new Map<MapTileset, Buffer>();
-        this.currentTilesetOptimization = this.generateNextTileset();
-        this.currentExtractedTiles = [];
         this.tileSize = options?.tile?.size ?? 32;
         this.tilesetMaxColumns = (options?.output?.tileset?.size?.width ?? 2048) / this.tileSize;
         this.tilesetMaxLines = (options?.output?.tileset?.size?.height ?? 2048) / this.tileSize;
         this.allowLogs = options?.logs ?? true;
+
+        this.currentTilesetOptimization = this.generateNextTileset();
+        this.currentExtractedTiles = [];
 
         for (const tileset of [...tilesetsBuffers.keys()]) {
             if (tileset.tileheight !== this.tileSize || tileset.tilewidth !== this.tileSize) {
@@ -138,7 +139,11 @@ export class Optimizer {
         }
 
         if (!oldTileset) {
-            throw Error("Corrupted layers or undefined tileset");
+            if (this.allowLogs) {
+                console.error(`${tileId} undefined! Corrupted layers or undefined in tilesets`);
+                console.error("This tile has been replaced by a empty tile");
+            }
+            return 0;
         }
 
         const newTileId = this.optimizedTiles.size + 1;
@@ -161,7 +166,7 @@ export class Optimizer {
             return newTileId;
         }
 
-        const tileData = oldTileset.tiles.find((tile) => tile.id === tileId);
+        const tileData = oldTileset.tiles.find((tile) => tile.id + 1 === tileId);
 
         if (!tileData) {
             return newTileId;
@@ -169,7 +174,7 @@ export class Optimizer {
 
         if (!newTileData) {
             newTileData = {
-                id: newTileId,
+                id: newTileId - 1,
             };
             this.currentTilesetOptimization.tiles?.push(newTileData);
         }
@@ -183,17 +188,9 @@ export class Optimizer {
         if (tileData.animation) {
             newTileData.animation = [];
             for (const frame of tileData.animation) {
-                if (frame.tileid === 0) {
-                    newTileData.animation.push({
-                        duration: frame.duration,
-                        tileid: 0,
-                    });
-                    continue;
-                }
-
                 newTileData.animation.push({
                     duration: frame.duration,
-                    tileid: this.optimizeNewTile(frame.tileid),
+                    tileid: this.optimizeNewTile(frame.tileid + 1) - 1,
                 });
             }
         }
@@ -208,9 +205,7 @@ export class Optimizer {
         const estimateLeft = tilesetTileId <= tilesetColumns ? tilesetTileId : tilesetTileId % tilesetColumns;
         const leftStartPoint = (estimateLeft === 0 ? tilesetColumns : estimateLeft) * this.tileSize - this.tileSize;
         const topStartPoint =
-            tilesetTileId <= tilesetColumns
-                ? 0
-                : Math.floor(tilesetTileId / tilesetColumns) * this.tileSize - this.tileSize;
+            tilesetTileId <= tilesetColumns ? 0 : Math.floor(tilesetTileId / tilesetColumns) * this.tileSize;
 
         return await sharp(this.tilesetsBuffers.get(tileset))
             .extract({

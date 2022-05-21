@@ -1,9 +1,8 @@
 import fs from "fs";
-import { PNG } from "pngjs";
-import sharp from "sharp";
 import { resolve } from "path";
-import { isMap, Map as MapFormat, MapTileset, MapTilesetTile } from "./mapGuards";
-import { OptimizeOptions } from "./libGuards";
+import { OptimizeBufferOptions, OptimizedMapFiles, OptimizeOptions } from "./guards/libGuards";
+import { isMap, Map as MapFormat, MapTileset } from "./guards/mapGuards";
+import { Optimizer } from "./Optimizer";
 
 async function getMap(mapFilePath: string): Promise<MapFormat> {
     let mapFile;
@@ -23,250 +22,49 @@ async function getMap(mapFilePath: string): Promise<MapFormat> {
     return isRealMap.data;
 }
 
-async function optimizeNewTile(
-    map: MapFormat,
-    tileId: number,
-    tileSize: number,
-    tilesetFiles: Map<MapTileset, Buffer>,
-    optimizedTileset: MapTileset,
-    optimizedTiles: Map<number, number>,
-    optimizedTilesetFile: Buffer
-): Promise<[number, Buffer]> {
-    let oldTileset: MapTileset | undefined;
-
-    for (const tileset of tilesetFiles.keys()) {
-        if (tileset.firstgid <= tileId && tileset.firstgid + tileset.tilecount > tileId) {
-            oldTileset = tileset;
-            break;
-        }
-    }
-
-    if (!oldTileset) {
-        throw Error("Corrupted layers or undefined tileset");
-    }
-
-    const tilesetColumns = oldTileset.imagewidth / tileSize;
-    const tilesetTileId = tileId - oldTileset.firstgid + 1;
-
-    let leftStartPoint = 0;
-    let topStartPoint = 0;
-
-    for (let x = 0; x < tilesetColumns; x++) {
-        if (tilesetTileId > tilesetColumns * (x + 1)) {
-            topStartPoint += tileSize;
-            continue;
-        }
-
-        leftStartPoint = (tileId - tilesetColumns * x) * tileSize - tileSize;
-        break;
-    }
-
-    const tile = await sharp(tilesetFiles.get(oldTileset))
-        .extract({
-            left: leftStartPoint,
-            top: topStartPoint,
-            width: tileSize,
-            height: tileSize,
-        })
-        .toBuffer();
-
-    let newOptimizedTilesetFile = await sharp(optimizedTilesetFile).toBuffer();
-
-    if (optimizedTiles.size !== 0) {
-        newOptimizedTilesetFile = await sharp(newOptimizedTilesetFile)
-            .extend({
-                right: tileSize,
-                background: { r: 0, g: 0, b: 0, alpha: 0 },
-            })
-            .toBuffer();
-    }
-
-    newOptimizedTilesetFile = await sharp(newOptimizedTilesetFile)
-        .composite([
-            {
-                input: tile,
-                top: 0,
-                left: tileSize * optimizedTiles.size,
-            },
-        ])
-        .toBuffer();
-
-    const newTileId = optimizedTiles.size + 1;
-
-    optimizedTiles.set(tileId, newTileId);
-
-    let newTileData: MapTilesetTile | undefined = undefined;
-
-    if (oldTileset.properties) {
-        newTileData = {
-            id: newTileId,
-            properties: oldTileset.properties,
-        };
-        optimizedTileset.tiles?.push(newTileData);
-    }
-
-    if (!oldTileset.tiles) {
-        return [newTileId, newOptimizedTilesetFile];
-    }
-
-    const tileData = oldTileset.tiles.find((tile) => tile.id === tileId);
-
-    if (!tileData) {
-        return [newTileId, newOptimizedTilesetFile];
-    }
-
-    if (!newTileData) {
-        newTileData = {
-            id: newTileId,
-        };
-        optimizedTileset.tiles?.push(newTileData);
-    }
-
-    if (tileData.properties) {
-        newTileData.properties
-            ? newTileData.properties.push(...tileData.properties)
-            : (newTileData.properties = tileData.properties);
-    }
-
-    if (tileData.animation) {
-        newTileData.animation = [];
-        for (const frame of tileData.animation) {
-            if (frame.tileid === 0) {
-                newTileData.animation.push({
-                    duration: frame.duration,
-                    tileid: 0,
-                });
-                continue;
-            }
-
-            let newFrameTileId: number;
-            const existantNewFrameTileId = optimizedTiles.get(frame.tileid);
-
-            if (existantNewFrameTileId) {
-                newFrameTileId = existantNewFrameTileId;
-            } else {
-                const newOptimisedTile = await optimizeNewTile(
-                    map,
-                    tileId,
-                    tileSize,
-                    tilesetFiles,
-                    optimizedTileset,
-                    optimizedTiles,
-                    newOptimizedTilesetFile
-                );
-
-                newFrameTileId = newOptimisedTile[0];
-                newOptimizedTilesetFile = newOptimisedTile[1];
-            }
-
-            newTileData.animation.push({
-                duration: frame.duration,
-                tileid: newFrameTileId,
-            });
-        }
-    }
-
-    return [newTileId, newOptimizedTilesetFile];
-}
-
 export const optimize = async (
     mapFilePath: string,
     options: OptimizeOptions | undefined = undefined
 ): Promise<void> => {
     const map: MapFormat = await getMap(mapFilePath);
     const mapDirectoyPath = resolve(mapFilePath.substring(0, mapFilePath.lastIndexOf("/")));
-    const tilesetFiles = new Map<MapTileset, Buffer>();
-    const tileSize = options?.tile?.size ?? 32;
+    const tilesets = new Map<MapTileset, Buffer>();
 
     for (const tileset of map.tilesets) {
-        if (tileset.tileheight !== tileSize || tileset.tilewidth !== tileSize) {
-            throw Error(`Tileset ${tileset.name} not compatible! Accept only ${tileSize} tile size`);
-        }
-
         try {
-            tilesetFiles.set(tileset, await fs.promises.readFile(resolve(`${mapDirectoyPath}/${tileset.image}`)));
+            tilesets.set(tileset, await fs.promises.readFile(resolve(`${mapDirectoyPath}/${tileset.image}`)));
         } catch (err) {
             throw Error(`Undefined tileset file: ${tileset.image}`);
         }
     }
 
-    const optimizedTileset: MapTileset = {
-        columns: 0,
-        firstgid: 1,
-        image: "optimized.png",
-        imageheight: 0,
-        imagewidth: 0,
-        margin: 0,
-        name: "Optimized",
-        properties: [],
-        spacing: 0,
-        tilecount: 0,
-        tileheight: tileSize,
-        tilewidth: tileSize,
-        tiles: [],
-    };
-    const optimizedTiles = new Map<number, number>();
-    const newFile = new PNG({
-        width: tileSize,
-        height: tileSize,
-        filterType: -1,
-    });
-    let optimizedTilesetFile = await newFile.pack().pipe(sharp()).toBuffer();
+    const optimizer = new Optimizer(map, tilesets, options);
+    const result = await optimizer.optimize();
 
-    for (let i = 0; i < map.layers.length; i++) {
-        const layer = map.layers[i];
-
-        if (!layer.data) {
-            continue;
-        }
-
-        for (let y = 0; y < layer.data.length; y++) {
-            const tileId = layer.data[y];
-
-            if (tileId === 0) {
-                continue;
-            }
-
-            const existantNewTileId = optimizedTiles.get(tileId);
-
-            if (existantNewTileId) {
-                layer.data[y] = existantNewTileId;
-                continue;
-            }
-
-            const updatedData = await optimizeNewTile(
-                map,
-                tileId,
-                tileSize,
-                tilesetFiles,
-                optimizedTileset,
-                optimizedTiles,
-                optimizedTilesetFile
-            );
-
-            layer.data[y] = updatedData[0];
-            optimizedTilesetFile = updatedData[1];
-        }
-    }
-
-    map.tilesets = [optimizedTileset];
-
+    const outputMapName = (options?.output?.map?.name ?? "map") + ".json";
     const ouputPath = mapDirectoyPath + "/" + (options?.output?.path ?? "dist");
-    const outputMapName = (options?.output?.mapName ?? "map") + ".json";
-    const outputTilesetName = (options?.output?.tilesetName ?? "chunk") + ".png";
-
-    optimizedTileset.columns = optimizedTiles.size;
-    optimizedTileset.imageheight = tileSize;
-    optimizedTileset.imagewidth = optimizedTiles.size * tileSize;
-    optimizedTileset.tilecount = optimizedTiles.size;
-    optimizedTileset.image = outputTilesetName;
 
     if (!fs.existsSync(ouputPath)) {
         fs.mkdirSync(ouputPath, { recursive: true });
     }
 
+    const tilesetsPromises: Promise<void>[] = [];
+
+    for (const tileset of result.tilesetsBuffer) {
+        tilesetsPromises.push(fs.promises.writeFile(`${ouputPath}/${tileset[0]}`, tileset[1]));
+    }
+
     await Promise.all([
         fs.promises.writeFile(`${ouputPath}/${outputMapName}`, JSON.stringify(map, null, 2)),
-        fs.promises.writeFile(`${ouputPath}/${outputTilesetName}`, optimizedTilesetFile),
+        ...tilesetsPromises,
     ]);
+};
+
+export const optimizeToBuffer = async (
+    map: MapFormat,
+    tilesetsBuffers: Map<MapTileset, Buffer>,
+    options: OptimizeBufferOptions | undefined = undefined
+): Promise<OptimizedMapFiles> => {
+    const optimizer = new Optimizer(map, tilesetsBuffers, options);
+    return await optimizer.optimize();
 };

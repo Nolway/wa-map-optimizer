@@ -1,7 +1,7 @@
 import { PNG } from "pngjs";
 import sharp from "sharp";
 import { OptimizeBufferOptions, OptimizedMapFiles } from "./guards/libGuards";
-import { Map as MapFormat, MapTileset, MapTilesetTile } from "./guards/mapGuards";
+import { Map as MapFormat, MapLayer, MapTileset, MapTilesetTile } from "./guards/mapGuards";
 
 sharp.cache(false);
 
@@ -44,27 +44,7 @@ export class Optimizer {
             console.log("Start map optimization...");
         }
 
-        for (let i = 0; i < this.optimizedMap.layers.length; i++) {
-            const layer = this.optimizedMap.layers[i];
-
-            if (!layer.data) {
-                continue;
-            }
-
-            for (let y = 0; y < layer.data.length; y++) {
-                const tileId = layer.data[y];
-
-                if (tileId === 0) {
-                    continue;
-                }
-
-                await this.checkCurrentTileset();
-
-                const newTileId = this.optimizeNewTile(tileId);
-
-                layer.data[y] = newTileId;
-            }
-        }
+        await this.optimizeLayers(this.optimizedMap.layers);
 
         await this.currentTilesetRendering();
 
@@ -84,6 +64,43 @@ export class Optimizer {
             map: this.optimizedMap,
             tilesetsBuffer,
         };
+    }
+
+    private async optimizeLayers(layers: MapLayer[]): Promise<void> {
+        for (let i = 0; i < layers.length; i++) {
+            const layer = layers[i];
+
+            if (layer.type === "group") {
+                if (!layer.layers) {
+                    continue;
+                }
+
+                await this.optimizeLayers(layer.layers);
+                continue;
+            }
+
+            if (layer.type !== "tilelayer") {
+                continue;
+            }
+
+            if (!layer.data) {
+                continue;
+            }
+
+            for (let y = 0; y < layer.data.length; y++) {
+                const tileId = layer.data[y];
+
+                if (tileId === 0) {
+                    continue;
+                }
+
+                await this.checkCurrentTileset();
+
+                const newTileId = this.optimizeNewTile(tileId);
+
+                layer.data[y] = newTileId;
+            }
+        }
     }
 
     private generateNextTileset(): MapTileset {
@@ -154,9 +171,12 @@ export class Optimizer {
 
         this.currentExtractedTiles.push(this.extractTile(oldTileset, tileId));
 
+        const oldTileIdInTileset = tileId - oldTileset.firstgid;
+        const newTileIdInTileset = this.currentExtractedTiles.length - 1;
+
         if (oldTileset.properties) {
             newTileData = {
-                id: newTileId,
+                id: newTileIdInTileset,
                 properties: oldTileset.properties,
             };
             this.currentTilesetOptimization.tiles?.push(newTileData);
@@ -166,7 +186,7 @@ export class Optimizer {
             return newTileId;
         }
 
-        const tileData = oldTileset.tiles.find((tile) => tile.id + 1 === tileId);
+        const tileData = oldTileset.tiles.find((tile) => tile.id === oldTileIdInTileset);
 
         if (!tileData) {
             return newTileId;
@@ -174,7 +194,7 @@ export class Optimizer {
 
         if (!newTileData) {
             newTileData = {
-                id: newTileId - 1,
+                id: newTileIdInTileset,
             };
             this.currentTilesetOptimization.tiles?.push(newTileData);
         }
@@ -188,9 +208,17 @@ export class Optimizer {
         if (tileData.animation) {
             newTileData.animation = [];
             for (const frame of tileData.animation) {
+                const newAnimationId = this.optimizeNewTile(oldTileset.firstgid + frame.tileid);
+
+                if (!newAnimationId) {
+                    throw new Error(
+                        "Oops! An anmiation was beetween 2 tilesets, please modify the tileset output sizes"
+                    );
+                }
+
                 newTileData.animation.push({
                     duration: frame.duration,
-                    tileid: this.optimizeNewTile(frame.tileid + 1) - 1,
+                    tileid: this.currentExtractedTiles.length - 1,
                 });
             }
         }
@@ -204,8 +232,13 @@ export class Optimizer {
 
         const estimateLeft = tilesetTileId <= tilesetColumns ? tilesetTileId : tilesetTileId % tilesetColumns;
         const leftStartPoint = (estimateLeft === 0 ? tilesetColumns : estimateLeft) * this.tileSize - this.tileSize;
-        const topStartPoint =
-            tilesetTileId <= tilesetColumns ? 0 : Math.floor(tilesetTileId / tilesetColumns) * this.tileSize;
+        let topStartPoint = 0;
+        let state = tilesetTileId;
+
+        while (state > tilesetColumns) {
+            state -= tilesetColumns;
+            topStartPoint += this.tileSize;
+        }
 
         return await sharp(this.tilesetsBuffers.get(tileset))
             .extract({

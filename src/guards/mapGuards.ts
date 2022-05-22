@@ -24,23 +24,35 @@ export const isMapTileset = z.object({
     columns: z.number(),
     firstgid: z.number(),
     image: z.string(),
-    imageheight: z.number(),
-    imagewidth: z.number(),
+    imageheight: z.number().multipleOf(32),
+    imagewidth: z.number().multipleOf(32),
     margin: z.number(),
     name: z.string(),
     properties: isProperty.passthrough().array().optional(),
     spacing: z.number(),
     tilecount: z.number(),
-    tileheight: z.number(),
-    tilewidth: z.number(),
+    tileheight: z.number().multipleOf(32),
+    tilewidth: z.number().multipleOf(32),
     tiles: isMapTilesetTile.passthrough().array().optional(),
 });
 
 export type MapTileset = z.infer<typeof isMapTileset>;
 
-export const isMapLayer = z.object({
-    data: z.number().gte(0).array().optional(),
-});
+export type MapLayer = {
+    type?: string;
+    layers?: MapLayer[];
+    data?: number[];
+};
+
+export const isMapLayer: z.ZodType<MapLayer> = z.lazy(() =>
+    z
+        .object({
+            type: z.string().optional(),
+            layers: z.array(isMapLayer).optional(),
+            data: z.number().gte(0).array().optional(),
+        })
+        .passthrough()
+);
 
 export const isMap = z.object({
     tilesets: isMapTileset.passthrough().array(),
@@ -48,7 +60,7 @@ export const isMap = z.object({
     tileheight: z.number(),
     tilewidth: z.number(),
     properties: isProperty.passthrough().array().optional(),
-    layers: isMapLayer.passthrough().array(),
+    layers: isMapLayer.array(),
 });
 
 export type Map = z.infer<typeof isMap>;

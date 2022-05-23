@@ -10,8 +10,8 @@ WorkAdventure Map Optimizer! Does your map need a diet?
 
 ## Requirements
 
-- Node 16.15 <
--	Yarn 1.22 <
+- Node 16.15+
+-	Yarn 1.22+
 
 ## Install
 
@@ -32,7 +32,7 @@ async function run() {
 run();
 ```
 
-## Advenced usage
+## Advanced usage
 
 ```ts
 import { optimize } from "wa-map-optimizer";

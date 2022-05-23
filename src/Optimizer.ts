@@ -136,20 +136,57 @@ export class Optimizer {
     }
 
     private optimizeNewTile(tileId: number): number {
-        const existantNewTileId = this.optimizedTiles.get(tileId);
-
-        if (existantNewTileId) {
-            return existantNewTileId;
-        }
-
         if (this.allowLogs) {
             console.log(`${tileId} tile is optimizing...`);
+        }
+
+        let minBitId;
+
+        // 3758096384 = 29 & 30 & 31
+        // 3221225472 = 30 & 31
+        // 2684354560 = 29 & 31
+        // 2147483648 = 31
+        // 1610612736 = 29 & 30
+        // 1073741824 = 30
+        // 536870912 = 29
+
+        const bit29 = Math.pow(2, 29);
+        const bit30 = Math.pow(2, 30);
+        const bit31 = Math.pow(2, 31);
+        const bit32 = Math.pow(2, 32);
+
+        if (tileId < bit29) {
+            minBitId = 0;
+        } else if (tileId < bit30) {
+            minBitId = bit29;
+        } else if (tileId < bit29 + bit30) {
+            minBitId = bit30;
+        } else if (tileId < bit31) {
+            minBitId = bit29 + bit30;
+        } else if (tileId < bit29 + bit31) {
+            minBitId = bit31;
+        } else if (tileId < bit30 + bit31) {
+            minBitId = bit29 + bit31;
+        } else if (tileId < bit29 + bit30 + bit31) {
+            minBitId = bit29 + bit31;
+        } else if (tileId < bit32) {
+            minBitId = bit29 + bit30 + bit31;
+        } else {
+            throw new Error(`Something was wrong with flipped tile id ${tileId}`);
+        }
+
+        const unflippedTileId = tileId - minBitId;
+
+        const existantNewTileId = this.optimizedTiles.get(unflippedTileId);
+
+        if (existantNewTileId) {
+            return existantNewTileId + minBitId;
         }
 
         let oldTileset: MapTileset | undefined;
 
         for (const tileset of this.tilesetsBuffers.keys()) {
-            if (tileset.firstgid <= tileId && tileset.firstgid + tileset.tilecount > tileId) {
+            if (tileset.firstgid <= unflippedTileId && tileset.firstgid + tileset.tilecount > unflippedTileId) {
                 oldTileset = tileset;
                 break;
             }
@@ -165,13 +202,13 @@ export class Optimizer {
 
         const newTileId = this.optimizedTiles.size + 1;
 
-        this.optimizedTiles.set(tileId, newTileId);
+        this.optimizedTiles.set(unflippedTileId, newTileId);
 
         let newTileData: MapTilesetTile | undefined = undefined;
 
-        this.currentExtractedTiles.push(this.extractTile(oldTileset, tileId));
+        this.currentExtractedTiles.push(this.extractTile(oldTileset, unflippedTileId));
 
-        const oldTileIdInTileset = tileId - oldTileset.firstgid;
+        const oldTileIdInTileset = unflippedTileId - oldTileset.firstgid;
         const newTileIdInTileset = this.currentExtractedTiles.length - 1;
 
         if (oldTileset.properties) {
@@ -183,13 +220,13 @@ export class Optimizer {
         }
 
         if (!oldTileset.tiles) {
-            return newTileId;
+            return newTileId + minBitId;
         }
 
         const tileData = oldTileset.tiles.find((tile) => tile.id === oldTileIdInTileset);
 
         if (!tileData) {
-            return newTileId;
+            return newTileId + minBitId;
         }
 
         if (!newTileData) {
@@ -223,7 +260,7 @@ export class Optimizer {
             }
         }
 
-        return newTileId;
+        return newTileId + minBitId;
     }
 
     private async extractTile(tileset: MapTileset, tileId: number): Promise<Buffer> {

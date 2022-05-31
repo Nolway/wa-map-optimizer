@@ -50,7 +50,7 @@ const optimize = async (mapFilePath, options = undefined) => {
         tilesetsPromises.push(fs_1.default.promises.writeFile(`${ouputPath}/${tileset[0]}`, tileset[1]));
     }
     await Promise.all([
-        fs_1.default.promises.writeFile(`${ouputPath}/${outputMapName}`, JSON.stringify(map, null, 2)),
+        fs_1.default.promises.writeFile(`${ouputPath}/${outputMapName}`, JSON.stringify(map, null, 0)),
         ...tilesetsPromises,
     ]);
 };

@@ -19,6 +19,7 @@ class Optimizer {
     tileSize;
     tilesetMaxColumns;
     tilesetMaxLines;
+    tilesetName;
     allowLogs;
     constructor(map, tilesetsBuffers, options = undefined) {
         this.tilesetsBuffers = tilesetsBuffers;
@@ -28,6 +29,7 @@ class Optimizer {
         this.tileSize = options?.tile?.size ?? 32;
         this.tilesetMaxColumns = (options?.output?.tileset?.size?.width ?? 2048) / this.tileSize;
         this.tilesetMaxLines = (options?.output?.tileset?.size?.height ?? 2048) / this.tileSize;
+        this.tilesetName = options?.output?.tileset?.name ?? "chunk";
         this.allowLogs = options?.logs ?? true;
         this.currentTilesetOptimization = this.generateNextTileset();
         this.currentExtractedTiles = [];
@@ -92,7 +94,7 @@ class Optimizer {
         return {
             columns: 1,
             firstgid: this.optimizedTiles.size + 1,
-            image: `chunk-${tilesetCount}.png`,
+            image: `${this.tilesetName}-${tilesetCount}.png`,
             imageheight: 0,
             imagewidth: 0,
             margin: 0,

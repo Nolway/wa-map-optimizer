@@ -11,6 +11,7 @@ export declare class Optimizer {
     private tileSize;
     private tilesetMaxColumns;
     private tilesetMaxLines;
+    private tilesetName;
     private allowLogs;
     constructor(map: MapFormat, tilesetsBuffers: Map<MapTileset, Buffer>, options?: OptimizeBufferOptions | undefined);
     optimize(): Promise<OptimizedMapFiles>;

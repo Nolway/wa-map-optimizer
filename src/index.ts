@@ -55,7 +55,7 @@ export const optimize = async (
     }
 
     await Promise.all([
-        fs.promises.writeFile(`${ouputPath}/${outputMapName}`, JSON.stringify(map, null, 2)),
+        fs.promises.writeFile(`${ouputPath}/${outputMapName}`, JSON.stringify(map, null, 0)),
         ...tilesetsPromises,
     ]);
 };

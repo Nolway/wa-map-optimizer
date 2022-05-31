@@ -1,6 +1,6 @@
 <h1>WA Map Optimizer 💪</h1>
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.0.2-blue.svg?cacheSeconds=2592000" />
+  <img alt="Version" src="https://img.shields.io/badge/version-1.1.0-blue.svg?cacheSeconds=2592000" />
   <a href="LICENSE.txt" target="_blank">
     <img alt="License: AGPL--3.0" src="https://img.shields.io/badge/License-AGPL--3.0-yellow.svg" />
   </a>
@@ -32,7 +32,7 @@ async function run() {
 run();
 ```
 
-## Advenced usage
+## Advanced usage
 
 ```ts
 import { optimize } from "wa-map-optimizer";
@@ -42,10 +42,19 @@ async function run() {
       tile: {
           size: 32,
       },
+      logs: true,
       output: {
           path: "optimisation/new_map",
-          mapName: "awesome-map",
-          tilesetName: "tile-opti",
+          map: {
+            name: "awesome-map",
+          },
+          tileset: {
+            name: "optimized-tileset",
+            size: {
+              width: 2048,
+              height: 2048,
+            }
+          }
       }
     });
     console.log("Optimization finished");

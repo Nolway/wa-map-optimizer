@@ -266,7 +266,7 @@ export class Optimizer {
     }
 
     private async extractTile(tileset: MapTileset, tileId: number): Promise<Buffer> {
-        const tilesetColumns = tileset.imagewidth / this.tileSize;
+        const tilesetColumns = Math.floor(tileset.imagewidth / this.tileSize);
         const tilesetTileId = tileId - tileset.firstgid + 1;
 
         const estimateLeft = tilesetTileId <= tilesetColumns ? tilesetTileId : tilesetTileId % tilesetColumns;

@@ -1,9 +1,7 @@
 "use strict";
-var __importDefault =
-    (this && this.__importDefault) ||
-    function (mod) {
-        return mod && mod.__esModule ? mod : { default: mod };
-    };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.optimizeToBuffer = exports.optimize = void 0;
 const fs_1 = __importDefault(require("fs"));
@@ -14,7 +12,8 @@ async function getMap(mapFilePath) {
     let mapFile;
     try {
         mapFile = await fs_1.default.promises.readFile(mapFilePath);
-    } catch (err) {
+    }
+    catch (err) {
         throw Error(`Cannot get the map file: ${err}`);
     }
     const isRealMap = mapGuards_1.isMap.passthrough().safeParse(JSON.parse(mapFile.toString("utf-8")));
@@ -30,11 +29,9 @@ const optimize = async (mapFilePath, options = undefined) => {
     const tilesets = new Map();
     for (const tileset of map.tilesets) {
         try {
-            tilesets.set(
-                tileset,
-                await fs_1.default.promises.readFile((0, path_1.resolve)(`${mapDirectoyPath}/${tileset.image}`))
-            );
-        } catch (err) {
+            tilesets.set(tileset, await fs_1.default.promises.readFile((0, path_1.resolve)(`${mapDirectoyPath}/${tileset.image}`)));
+        }
+        catch (err) {
             throw Error(`Undefined tileset file: ${tileset.image}`);
         }
     }

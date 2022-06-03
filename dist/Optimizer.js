@@ -1,9 +1,7 @@
 "use strict";
-var __importDefault =
-    (this && this.__importDefault) ||
-    function (mod) {
-        return mod && mod.__esModule ? mod : { default: mod };
-    };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Optimizer = void 0;
 const pngjs_1 = require("pngjs");
@@ -112,10 +110,7 @@ class Optimizer {
             width: width,
             height: height,
         });
-        return await newFile
-            .pack()
-            .pipe((0, sharp_1.default)())
-            .toBuffer();
+        return await newFile.pack().pipe((0, sharp_1.default)()).toBuffer();
     }
     optimizeNewTile(tileId) {
         if (this.allowLogs) {
@@ -135,21 +130,29 @@ class Optimizer {
         const bit32 = Math.pow(2, 32);
         if (tileId < bit29) {
             minBitId = 0;
-        } else if (tileId < bit30) {
+        }
+        else if (tileId < bit30) {
             minBitId = bit29;
-        } else if (tileId < bit29 + bit30) {
+        }
+        else if (tileId < bit29 + bit30) {
             minBitId = bit30;
-        } else if (tileId < bit31) {
+        }
+        else if (tileId < bit31) {
             minBitId = bit29 + bit30;
-        } else if (tileId < bit29 + bit31) {
+        }
+        else if (tileId < bit29 + bit31) {
             minBitId = bit31;
-        } else if (tileId < bit30 + bit31) {
+        }
+        else if (tileId < bit30 + bit31) {
             minBitId = bit29 + bit31;
-        } else if (tileId < bit29 + bit30 + bit31) {
+        }
+        else if (tileId < bit29 + bit30 + bit31) {
             minBitId = bit29 + bit31;
-        } else if (tileId < bit32) {
+        }
+        else if (tileId < bit32) {
             minBitId = bit29 + bit30 + bit31;
-        } else {
+        }
+        else {
             throw new Error(`Something was wrong with flipped tile id ${tileId}`);
         }
         const unflippedTileId = tileId - minBitId;
@@ -207,9 +210,7 @@ class Optimizer {
             for (const frame of tileData.animation) {
                 const newAnimationId = this.optimizeNewTile(oldTileset.firstgid + frame.tileid);
                 if (!newAnimationId) {
-                    throw new Error(
-                        "Oops! An anmiation was beetween 2 tilesets, please modify the tileset output sizes"
-                    );
+                    throw new Error("Oops! An anmiation was beetween 2 tilesets, please modify the tileset output sizes");
                 }
                 newTileData.animation.push({
                     duration: frame.duration,
@@ -220,7 +221,7 @@ class Optimizer {
         return newTileId + minBitId;
     }
     async extractTile(tileset, tileId) {
-        const tilesetColumns = tileset.imagewidth / this.tileSize;
+        const tilesetColumns = Math.floor(tileset.imagewidth / this.tileSize);
         const tilesetTileId = tileId - tileset.firstgid + 1;
         const estimateLeft = tilesetTileId <= tilesetColumns ? tilesetTileId : tilesetTileId % tilesetColumns;
         const leftStartPoint = (estimateLeft === 0 ? tilesetColumns : estimateLeft) * this.tileSize - this.tileSize;
@@ -232,11 +233,11 @@ class Optimizer {
         }
         return await (0, sharp_1.default)(this.tilesetsBuffers.get(tileset))
             .extract({
-                left: leftStartPoint,
-                top: topStartPoint,
-                width: this.tileSize,
-                height: this.tileSize,
-            })
+            left: leftStartPoint,
+            top: topStartPoint,
+            width: this.tileSize,
+            height: this.tileSize,
+        })
             .toBuffer();
     }
     async checkCurrentTileset() {
@@ -286,10 +287,7 @@ class Optimizer {
             });
             x += this.tileSize;
         }
-        this.optimizedTilesets.set(
-            this.currentTilesetOptimization,
-            await sharpTileset.composite(sharpComposites).toBuffer()
-        );
+        this.optimizedTilesets.set(this.currentTilesetOptimization, await sharpTileset.composite(sharpComposites).toBuffer());
         if (this.allowLogs) {
             console.log("Tileset optimized image generated");
             console.log("The tileset has been rendered");

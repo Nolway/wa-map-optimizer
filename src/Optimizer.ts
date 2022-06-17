@@ -216,7 +216,7 @@ export class Optimizer {
         if (oldTileset.properties) {
             newTileData = {
                 id: newTileIdInTileset,
-                properties: oldTileset.properties,
+                properties: [...oldTileset.properties],
             };
             this.currentTilesetOptimization.tiles?.push(newTileData);
         }
@@ -241,7 +241,7 @@ export class Optimizer {
         if (tileData.properties) {
             newTileData.properties
                 ? newTileData.properties.push(...tileData.properties)
-                : (newTileData.properties = tileData.properties);
+                : (newTileData.properties = [...tileData.properties]);
         }
 
         if (tileData.animation) {

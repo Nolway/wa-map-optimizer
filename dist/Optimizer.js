@@ -147,7 +147,7 @@ class Optimizer {
             minBitId = bit29 + bit31;
         }
         else if (tileId < bit29 + bit30 + bit31) {
-            minBitId = bit29 + bit31;
+            minBitId = bit30 + bit31;
         }
         else if (tileId < bit32) {
             minBitId = bit29 + bit30 + bit31;

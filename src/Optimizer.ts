@@ -26,8 +26,8 @@ export class Optimizer {
         this.optimizedTiles = new Map<number, number>();
         this.optimizedTilesets = new Map<MapTileset, Buffer>();
         this.tileSize = options?.tile?.size ?? 32;
-        this.tilesetMaxColumns = (options?.output?.tileset?.size?.width ?? 2048) / this.tileSize;
-        this.tilesetMaxLines = (options?.output?.tileset?.size?.height ?? 2048) / this.tileSize;
+        this.tilesetMaxColumns = (options?.output?.tileset?.size?.width ?? 1024) / this.tileSize;
+        this.tilesetMaxLines = (options?.output?.tileset?.size?.height ?? 1024) / this.tileSize;
         this.tilesetName = options?.output?.tileset?.name ?? "chunk";
         this.logLevel = options?.logs ?? LogLevel.NORMAL;
 

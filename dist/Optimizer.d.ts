@@ -12,7 +12,7 @@ export declare class Optimizer {
     private tilesetMaxColumns;
     private tilesetMaxLines;
     private tilesetName;
-    private allowLogs;
+    private logLevel;
     constructor(map: MapFormat, tilesetsBuffers: Map<MapTileset, Buffer>, options?: OptimizeBufferOptions | undefined);
     optimize(): Promise<OptimizedMapFiles>;
     private optimizeLayers;

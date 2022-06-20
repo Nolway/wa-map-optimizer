@@ -1,5 +1,10 @@
 /// <reference types="node" />
 import { z } from "zod";
+export declare enum LogLevel {
+    NONE = 0,
+    NORMAL = 1,
+    VERBOSE = 2
+}
 declare const isOptimizeBufferOptions: z.ZodObject<{
     tile: z.ZodOptional<z.ZodObject<{
         size: z.ZodOptional<z.ZodNumber>;
@@ -8,7 +13,7 @@ declare const isOptimizeBufferOptions: z.ZodObject<{
     }, {
         size?: number | undefined;
     }>>;
-    logs: z.ZodOptional<z.ZodBoolean>;
+    logs: z.ZodOptional<z.ZodNativeEnum<typeof LogLevel>>;
     output: z.ZodOptional<z.ZodObject<{
         tileset: z.ZodOptional<z.ZodObject<{
             name: z.ZodOptional<z.ZodString>;
@@ -56,7 +61,7 @@ declare const isOptimizeBufferOptions: z.ZodObject<{
     tile?: {
         size?: number | undefined;
     } | undefined;
-    logs?: boolean | undefined;
+    logs?: LogLevel | undefined;
     output?: {
         tileset?: {
             name?: string | undefined;
@@ -70,7 +75,7 @@ declare const isOptimizeBufferOptions: z.ZodObject<{
     tile?: {
         size?: number | undefined;
     } | undefined;
-    logs?: boolean | undefined;
+    logs?: LogLevel | undefined;
     output?: {
         tileset?: {
             name?: string | undefined;
@@ -90,7 +95,7 @@ declare const isOptimizeOptions: z.ZodObject<z.extendShape<{
     }, {
         size?: number | undefined;
     }>>;
-    logs: z.ZodOptional<z.ZodBoolean>;
+    logs: z.ZodOptional<z.ZodNativeEnum<typeof LogLevel>>;
     output: z.ZodOptional<z.ZodObject<{
         tileset: z.ZodOptional<z.ZodObject<{
             name: z.ZodOptional<z.ZodString>;
@@ -198,7 +203,7 @@ declare const isOptimizeOptions: z.ZodObject<z.extendShape<{
     tile?: {
         size?: number | undefined;
     } | undefined;
-    logs?: boolean | undefined;
+    logs?: LogLevel | undefined;
     output?: {
         map?: {
             name?: string | undefined;
@@ -216,7 +221,7 @@ declare const isOptimizeOptions: z.ZodObject<z.extendShape<{
     tile?: {
         size?: number | undefined;
     } | undefined;
-    logs?: boolean | undefined;
+    logs?: LogLevel | undefined;
     output?: {
         map?: {
             name?: string | undefined;

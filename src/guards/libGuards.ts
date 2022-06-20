@@ -1,13 +1,21 @@
 import { z } from "zod";
 import { isMap } from "./mapGuards";
 
+export enum LogLevel {
+    NONE = 0,
+    NORMAL = 1,
+    VERBOSE = 2,
+}
+
+const isLogLevel = z.nativeEnum(LogLevel);
+
 const isOptimizeBufferOptions = z.object({
     tile: z
         .object({
             size: z.number().positive().optional(),
         })
         .optional(),
-    logs: z.boolean().optional(),
+    logs: isLogLevel.optional(),
     output: z
         .object({
             tileset: z

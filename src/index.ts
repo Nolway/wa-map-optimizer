@@ -1,6 +1,6 @@
 import fs from "fs";
-import { resolve } from "path";
-import { OptimizeBufferOptions, OptimizedMapFiles, OptimizeOptions } from "./guards/libGuards";
+import path, { resolve } from "path";
+import { LogLevel, OptimizeBufferOptions, OptimizedMapFiles, OptimizeOptions } from "./guards/libGuards";
 import { isMap, Map as MapFormat, MapTileset } from "./guards/mapGuards";
 import { Optimizer } from "./Optimizer";
 
@@ -29,6 +29,12 @@ export const optimize = async (
     const map: MapFormat = await getMap(mapFilePath);
     const mapDirectoyPath = resolve(mapFilePath.substring(0, mapFilePath.lastIndexOf("/")));
     const tilesets = new Map<MapTileset, Buffer>();
+    const mapName = path.parse(mapFilePath).name;
+    const logLevel = options?.logs ?? LogLevel.NORMAL;
+
+    if (logLevel) {
+        console.log(`${mapName} optimization is started!`);
+    }
 
     for (const tileset of map.tilesets) {
         try {
@@ -41,7 +47,7 @@ export const optimize = async (
     const optimizer = new Optimizer(map, tilesets, options);
     const result = await optimizer.optimize();
 
-    const outputMapName = (options?.output?.map?.name ?? "map") + ".json";
+    const outputMapName = (options?.output?.map?.name ?? mapName) + ".json";
     const ouputPath = mapDirectoyPath + "/" + (options?.output?.path ?? "dist");
 
     if (!fs.existsSync(ouputPath)) {
@@ -52,6 +58,10 @@ export const optimize = async (
 
     for (const tileset of result.tilesetsBuffer) {
         tilesetsPromises.push(fs.promises.writeFile(`${ouputPath}/${tileset[0]}`, tileset[1]));
+    }
+
+    if (logLevel) {
+        console.log(`${mapName} file render is in progress!`);
     }
 
     await Promise.all([

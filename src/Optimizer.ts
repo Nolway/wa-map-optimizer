@@ -1,6 +1,6 @@
 import { PNG } from "pngjs";
 import sharp from "sharp";
-import { OptimizeBufferOptions, OptimizedMapFiles } from "./guards/libGuards";
+import { LogLevel, OptimizeBufferOptions, OptimizedMapFiles } from "./guards/libGuards";
 import { Map as MapFormat, MapLayer, MapTileset, MapTilesetTile } from "./guards/mapGuards";
 
 sharp.cache(false);
@@ -15,7 +15,7 @@ export class Optimizer {
     private tilesetMaxColumns: number;
     private tilesetMaxLines: number;
     private tilesetName: string;
-    private allowLogs: boolean;
+    private logLevel: LogLevel;
 
     constructor(
         map: MapFormat,
@@ -29,7 +29,7 @@ export class Optimizer {
         this.tilesetMaxColumns = (options?.output?.tileset?.size?.width ?? 2048) / this.tileSize;
         this.tilesetMaxLines = (options?.output?.tileset?.size?.height ?? 2048) / this.tileSize;
         this.tilesetName = options?.output?.tileset?.name ?? "chunk";
-        this.allowLogs = options?.logs ?? true;
+        this.logLevel = options?.logs ?? LogLevel.NORMAL;
 
         this.currentTilesetOptimization = this.generateNextTileset();
         this.currentExtractedTiles = [];
@@ -42,8 +42,8 @@ export class Optimizer {
     }
 
     public async optimize(): Promise<OptimizedMapFiles> {
-        if (this.allowLogs) {
-            console.log("Start map optimization...");
+        if (this.logLevel) {
+            console.log("Start tiles optimization...");
         }
 
         await this.optimizeLayers(this.optimizedMap.layers);
@@ -58,8 +58,8 @@ export class Optimizer {
             tilesetsBuffer.set(currentTileset[0].image, currentTileset[1]);
         }
 
-        if (this.allowLogs) {
-            console.log("Map optimization has been done");
+        if (this.logLevel) {
+            console.log("Tiles optimization has been done");
         }
 
         return {
@@ -106,7 +106,7 @@ export class Optimizer {
     }
 
     private generateNextTileset(): MapTileset {
-        if (this.allowLogs) {
+        if (this.logLevel) {
             console.log("Generate a new tileset data");
         }
 
@@ -138,7 +138,7 @@ export class Optimizer {
     }
 
     private optimizeNewTile(tileId: number): number {
-        if (this.allowLogs) {
+        if (this.logLevel === LogLevel.VERBOSE) {
             console.log(`${tileId} tile is optimizing...`);
         }
 
@@ -195,7 +195,7 @@ export class Optimizer {
         }
 
         if (!oldTileset) {
-            if (this.allowLogs) {
+            if (this.logLevel) {
                 console.error(`${tileId} undefined! Corrupted layers or undefined in tilesets`);
                 console.error("This tile has been replaced by a empty tile");
             }
@@ -297,7 +297,7 @@ export class Optimizer {
     }
 
     private async currentTilesetRendering(): Promise<void> {
-        if (this.allowLogs) {
+        if (this.logLevel) {
             console.log(`Rendering of ${this.currentTilesetOptimization.name} tileset...`);
         }
 
@@ -314,19 +314,19 @@ export class Optimizer {
 
         const tilesetBuffer = await this.generateNewTilesetBuffer(imageWidth, imageHeight);
 
-        if (this.allowLogs) {
+        if (this.logLevel === LogLevel.VERBOSE) {
             console.log("Empty image generated");
         }
 
         const sharpTileset = sharp(tilesetBuffer);
 
-        if (this.allowLogs) {
+        if (this.logLevel === LogLevel.VERBOSE) {
             console.log("Loading of all tiles who will be optimized...");
         }
 
         const tileBuffers = await Promise.all(this.currentExtractedTiles);
 
-        if (this.allowLogs) {
+        if (this.logLevel === LogLevel.VERBOSE) {
             console.log("Tiles loading finished");
             console.log("Tileset optimized image generating...");
         }
@@ -356,8 +356,11 @@ export class Optimizer {
             await sharpTileset.composite(sharpComposites).toBuffer()
         );
 
-        if (this.allowLogs) {
+        if (this.logLevel === LogLevel.VERBOSE) {
             console.log("Tileset optimized image generated");
+        }
+
+        if (this.logLevel) {
             console.log("The tileset has been rendered");
         }
 

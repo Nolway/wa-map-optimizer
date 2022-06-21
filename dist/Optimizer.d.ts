@@ -1,4 +1,4 @@
-/// <reference types="node" />
+import { Sharp } from "sharp";
 import { OptimizeBufferOptions, OptimizedMapFiles } from "./guards/libGuards";
 import { Map as MapFormat, MapTileset } from "./guards/mapGuards";
 export declare class Optimizer {
@@ -13,7 +13,7 @@ export declare class Optimizer {
     private tilesetMaxLines;
     private tilesetName;
     private logLevel;
-    constructor(map: MapFormat, tilesetsBuffers: Map<MapTileset, Buffer>, options?: OptimizeBufferOptions | undefined);
+    constructor(map: MapFormat, tilesetsBuffers: Map<MapTileset, Sharp>, options?: OptimizeBufferOptions | undefined);
     optimize(): Promise<OptimizedMapFiles>;
     private optimizeLayers;
     private generateNextTileset;

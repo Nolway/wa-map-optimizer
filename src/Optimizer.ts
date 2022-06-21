@@ -1,5 +1,5 @@
 import { PNG } from "pngjs";
-import sharp from "sharp";
+import sharp, { Sharp } from "sharp";
 import { LogLevel, OptimizeBufferOptions, OptimizedMapFiles } from "./guards/libGuards";
 import { Map as MapFormat, MapLayer, MapTileset, MapTilesetTile } from "./guards/mapGuards";
 
@@ -19,7 +19,7 @@ export class Optimizer {
 
     constructor(
         map: MapFormat,
-        private readonly tilesetsBuffers: Map<MapTileset, Buffer>,
+        private readonly tilesetsBuffers: Map<MapTileset, Sharp>,
         options: OptimizeBufferOptions | undefined = undefined
     ) {
         this.optimizedMap = map;
@@ -106,7 +106,7 @@ export class Optimizer {
     }
 
     private generateNextTileset(): MapTileset {
-        if (this.logLevel) {
+        if (this.logLevel === LogLevel.VERBOSE) {
             console.log("Generate a new tileset data");
         }
 
@@ -279,7 +279,13 @@ export class Optimizer {
             topStartPoint += this.tileSize;
         }
 
-        return await sharp(this.tilesetsBuffers.get(tileset))
+        const sharpObject = this.tilesetsBuffers.get(tileset);
+
+        if (!sharpObject) {
+            throw new Error("Undefined sharp object");
+        }
+
+        return await sharpObject
             .extract({
                 left: leftStartPoint,
                 top: topStartPoint,

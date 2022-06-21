@@ -1,5 +1,6 @@
 import fs from "fs";
 import path, { resolve } from "path";
+import sharp, { Sharp } from "sharp";
 import { LogLevel, OptimizeBufferOptions, OptimizedMapFiles, OptimizeOptions } from "./guards/libGuards";
 import { isMap, Map as MapFormat, MapTileset } from "./guards/mapGuards";
 import { Optimizer } from "./Optimizer";
@@ -28,7 +29,7 @@ export const optimize = async (
 ): Promise<void> => {
     const map: MapFormat = await getMap(mapFilePath);
     const mapDirectoyPath = resolve(mapFilePath.substring(0, mapFilePath.lastIndexOf("/")));
-    const tilesets = new Map<MapTileset, Buffer>();
+    const tilesets = new Map<MapTileset, Sharp>();
     const mapName = path.parse(mapFilePath).name;
     const logLevel = options?.logs ?? LogLevel.NORMAL;
 
@@ -38,7 +39,20 @@ export const optimize = async (
 
     for (const tileset of map.tilesets) {
         try {
-            tilesets.set(tileset, await fs.promises.readFile(resolve(`${mapDirectoyPath}/${tileset.image}`)));
+            const { data, info } = await sharp(resolve(`${mapDirectoyPath}/${tileset.image}`))
+                .raw()
+                .toBuffer({ resolveWithObject: true });
+
+            tilesets.set(
+                tileset,
+                sharp(new Uint8ClampedArray(data.buffer), {
+                    raw: {
+                        width: info.width,
+                        height: info.height,
+                        channels: info.channels,
+                    },
+                }).png()
+            );
         } catch (err) {
             throw Error(`Undefined tileset file: ${tileset.image}`);
         }
@@ -75,6 +89,22 @@ export const optimizeToBuffer = async (
     tilesetsBuffers: Map<MapTileset, Buffer>,
     options: OptimizeBufferOptions | undefined = undefined
 ): Promise<OptimizedMapFiles> => {
-    const optimizer = new Optimizer(map, tilesetsBuffers, options);
+    const tilesets = new Map<MapTileset, Sharp>();
+
+    for (const tileset of tilesetsBuffers.keys()) {
+        const { data, info } = await sharp(tilesetsBuffers.get(tileset)).raw().toBuffer({ resolveWithObject: true });
+        tilesets.set(
+            tileset,
+            sharp(new Uint8ClampedArray(data.buffer), {
+                raw: {
+                    width: info.width,
+                    height: info.height,
+                    channels: info.channels,
+                },
+            }).png()
+        );
+    }
+
+    const optimizer = new Optimizer(map, tilesets, options);
     return await optimizer.optimize();
 };

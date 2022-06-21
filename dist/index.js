@@ -29,6 +29,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.optimizeToBuffer = exports.optimize = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importStar(require("path"));
+const sharp_1 = __importDefault(require("sharp"));
 const libGuards_1 = require("./guards/libGuards");
 const mapGuards_1 = require("./guards/mapGuards");
 const Optimizer_1 = require("./Optimizer");
@@ -58,7 +59,16 @@ const optimize = async (mapFilePath, options = undefined) => {
     }
     for (const tileset of map.tilesets) {
         try {
-            tilesets.set(tileset, await fs_1.default.promises.readFile((0, path_1.resolve)(`${mapDirectoyPath}/${tileset.image}`)));
+            const { data, info } = await (0, sharp_1.default)((0, path_1.resolve)(`${mapDirectoyPath}/${tileset.image}`))
+                .raw()
+                .toBuffer({ resolveWithObject: true });
+            tilesets.set(tileset, (0, sharp_1.default)(new Uint8ClampedArray(data.buffer), {
+                raw: {
+                    width: info.width,
+                    height: info.height,
+                    channels: info.channels,
+                },
+            }).png());
         }
         catch (err) {
             throw Error(`Undefined tileset file: ${tileset.image}`);
@@ -85,7 +95,18 @@ const optimize = async (mapFilePath, options = undefined) => {
 };
 exports.optimize = optimize;
 const optimizeToBuffer = async (map, tilesetsBuffers, options = undefined) => {
-    const optimizer = new Optimizer_1.Optimizer(map, tilesetsBuffers, options);
+    const tilesets = new Map();
+    for (const tileset of tilesetsBuffers.keys()) {
+        const { data, info } = await (0, sharp_1.default)(tilesetsBuffers.get(tileset)).raw().toBuffer({ resolveWithObject: true });
+        tilesets.set(tileset, (0, sharp_1.default)(new Uint8ClampedArray(data.buffer), {
+            raw: {
+                width: info.width,
+                height: info.height,
+                channels: info.channels,
+            },
+        }).png());
+    }
+    const optimizer = new Optimizer_1.Optimizer(map, tilesets, options);
     return await optimizer.optimize();
 };
 exports.optimizeToBuffer = optimizeToBuffer;

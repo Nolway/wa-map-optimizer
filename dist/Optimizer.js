@@ -86,7 +86,7 @@ class Optimizer {
         }
     }
     generateNextTileset() {
-        if (this.logLevel) {
+        if (this.logLevel === libGuards_1.LogLevel.VERBOSE) {
             console.log("Generate a new tileset data");
         }
         const tilesetCount = this.optimizedTilesets.size + 1;
@@ -232,7 +232,11 @@ class Optimizer {
             state -= tilesetColumns;
             topStartPoint += this.tileSize;
         }
-        return await (0, sharp_1.default)(this.tilesetsBuffers.get(tileset))
+        const sharpObject = this.tilesetsBuffers.get(tileset);
+        if (!sharpObject) {
+            throw new Error("Undefined sharp object");
+        }
+        return await sharpObject
             .extract({
             left: leftStartPoint,
             top: topStartPoint,

@@ -266,17 +266,19 @@ export class Optimizer {
     }
 
     private async extractTile(tileset: MapTileset, tileId: number): Promise<Buffer> {
-        const tilesetColumns = Math.floor(tileset.imagewidth / this.tileSize);
+        const tileSizeSpaced = this.tileSize + tileset.spacing;
+        const tilesetColumns = Math.floor((tileset.imagewidth - tileset.margin + tileset.spacing) / tileSizeSpaced);
         const tilesetTileId = tileId - tileset.firstgid + 1;
 
         const estimateLeft = tilesetTileId <= tilesetColumns ? tilesetTileId : tilesetTileId % tilesetColumns;
-        const leftStartPoint = (estimateLeft === 0 ? tilesetColumns : estimateLeft) * this.tileSize - this.tileSize;
-        let topStartPoint = 0;
+        const leftStartPoint =
+            (estimateLeft === 0 ? tilesetColumns : estimateLeft) * tileSizeSpaced - tileSizeSpaced + tileset.margin;
+        let topStartPoint = tileset.margin;
         let state = tilesetTileId;
 
         while (state > tilesetColumns) {
             state -= tilesetColumns;
-            topStartPoint += this.tileSize;
+            topStartPoint += tileSizeSpaced;
         }
 
         const sharpObject = this.tilesetsBuffers.get(tileset);

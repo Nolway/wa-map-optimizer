@@ -31,6 +31,7 @@ export const optimize = async (
     const mapDirectoyPath = resolve(mapFilePath.substring(0, mapFilePath.lastIndexOf("/")));
     const tilesets = new Map<MapTileset, Sharp>();
     const mapName = path.parse(mapFilePath).name;
+    const mapExtension = path.parse(mapFilePath).ext;
     const logLevel = options?.logs ?? LogLevel.NORMAL;
 
     if (logLevel) {
@@ -61,7 +62,7 @@ export const optimize = async (
     const optimizer = new Optimizer(map, tilesets, options);
     const result = await optimizer.optimize();
 
-    const outputMapName = (options?.output?.map?.name ?? mapName) + ".json";
+    const outputMapName = (options?.output?.map?.name ?? mapName) + mapExtension;
     const ouputPath = mapDirectoyPath + "/" + (options?.output?.path ?? "dist");
 
     if (!fs.existsSync(ouputPath)) {

@@ -53,6 +53,7 @@ const optimize = async (mapFilePath, options = undefined) => {
     const mapDirectoyPath = (0, path_1.resolve)(mapFilePath.substring(0, mapFilePath.lastIndexOf("/")));
     const tilesets = new Map();
     const mapName = path_1.default.parse(mapFilePath).name;
+    const mapExtension = path_1.default.parse(mapFilePath).ext;
     const logLevel = options?.logs ?? libGuards_1.LogLevel.NORMAL;
     if (logLevel) {
         console.log(`${mapName} optimization is started!`);
@@ -76,7 +77,7 @@ const optimize = async (mapFilePath, options = undefined) => {
     }
     const optimizer = new Optimizer_1.Optimizer(map, tilesets, options);
     const result = await optimizer.optimize();
-    const outputMapName = (options?.output?.map?.name ?? mapName) + ".json";
+    const outputMapName = (options?.output?.map?.name ?? mapName) + mapExtension;
     const ouputPath = mapDirectoyPath + "/" + (options?.output?.path ?? "dist");
     if (!fs_1.default.existsSync(ouputPath)) {
         fs_1.default.mkdirSync(ouputPath, { recursive: true });

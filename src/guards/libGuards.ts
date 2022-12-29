@@ -21,12 +21,7 @@ const isOptimizeBufferOptions = z.object({
             tileset: z
                 .object({
                     name: z.string().optional(),
-                    size: z
-                        .object({
-                            width: z.number().gte(32).multipleOf(8).optional(),
-                            height: z.number().gte(32).multipleOf(8).optional(),
-                        })
-                        .optional(),
+                    size: z.number().gte(32).multipleOf(8).optional(),
                 })
                 .optional(),
         })
@@ -47,12 +42,7 @@ const isOptimizeOptions = isOptimizeBufferOptions.extend({
             tileset: z
                 .object({
                     name: z.string().optional(),
-                    size: z
-                        .object({
-                            width: z.number().gte(32).multipleOf(8).optional(),
-                            height: z.number().gte(32).multipleOf(8).optional(),
-                        })
-                        .optional(),
+                    size: z.number().gte(32).multipleOf(8).optional(),
                 })
                 .optional(),
         })

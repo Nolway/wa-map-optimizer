@@ -22,12 +22,7 @@ const isOptimizeBufferOptions = zod_1.z.object({
         tileset: zod_1.z
             .object({
             name: zod_1.z.string().optional(),
-            size: zod_1.z
-                .object({
-                width: zod_1.z.number().gte(32).multipleOf(8).optional(),
-                height: zod_1.z.number().gte(32).multipleOf(8).optional(),
-            })
-                .optional(),
+            size: zod_1.z.number().gte(32).multipleOf(8).optional(),
         })
             .optional(),
     })
@@ -45,12 +40,7 @@ const isOptimizeOptions = isOptimizeBufferOptions.extend({
         tileset: zod_1.z
             .object({
             name: zod_1.z.string().optional(),
-            size: zod_1.z
-                .object({
-                width: zod_1.z.number().gte(32).multipleOf(8).optional(),
-                height: zod_1.z.number().gte(32).multipleOf(8).optional(),
-            })
-                .optional(),
+            size: zod_1.z.number().gte(32).multipleOf(8).optional(),
         })
             .optional(),
     })

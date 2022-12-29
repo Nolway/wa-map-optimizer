@@ -17,44 +17,23 @@ declare const isOptimizeBufferOptions: z.ZodObject<{
     output: z.ZodOptional<z.ZodObject<{
         tileset: z.ZodOptional<z.ZodObject<{
             name: z.ZodOptional<z.ZodString>;
-            size: z.ZodOptional<z.ZodObject<{
-                width: z.ZodOptional<z.ZodNumber>;
-                height: z.ZodOptional<z.ZodNumber>;
-            }, "strip", z.ZodTypeAny, {
-                width?: number | undefined;
-                height?: number | undefined;
-            }, {
-                width?: number | undefined;
-                height?: number | undefined;
-            }>>;
+            size: z.ZodOptional<z.ZodNumber>;
         }, "strip", z.ZodTypeAny, {
             name?: string | undefined;
-            size?: {
-                width?: number | undefined;
-                height?: number | undefined;
-            } | undefined;
+            size?: number | undefined;
         }, {
             name?: string | undefined;
-            size?: {
-                width?: number | undefined;
-                height?: number | undefined;
-            } | undefined;
+            size?: number | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
         tileset?: {
             name?: string | undefined;
-            size?: {
-                width?: number | undefined;
-                height?: number | undefined;
-            } | undefined;
+            size?: number | undefined;
         } | undefined;
     }, {
         tileset?: {
             name?: string | undefined;
-            size?: {
-                width?: number | undefined;
-                height?: number | undefined;
-            } | undefined;
+            size?: number | undefined;
         } | undefined;
     }>>;
 }, "strip", z.ZodTypeAny, {
@@ -65,10 +44,7 @@ declare const isOptimizeBufferOptions: z.ZodObject<{
     output?: {
         tileset?: {
             name?: string | undefined;
-            size?: {
-                width?: number | undefined;
-                height?: number | undefined;
-            } | undefined;
+            size?: number | undefined;
         } | undefined;
     } | undefined;
 }, {
@@ -79,10 +55,7 @@ declare const isOptimizeBufferOptions: z.ZodObject<{
     output?: {
         tileset?: {
             name?: string | undefined;
-            size?: {
-                width?: number | undefined;
-                height?: number | undefined;
-            } | undefined;
+            size?: number | undefined;
         } | undefined;
     } | undefined;
 }>;
@@ -99,44 +72,23 @@ declare const isOptimizeOptions: z.ZodObject<z.extendShape<{
     output: z.ZodOptional<z.ZodObject<{
         tileset: z.ZodOptional<z.ZodObject<{
             name: z.ZodOptional<z.ZodString>;
-            size: z.ZodOptional<z.ZodObject<{
-                width: z.ZodOptional<z.ZodNumber>;
-                height: z.ZodOptional<z.ZodNumber>;
-            }, "strip", z.ZodTypeAny, {
-                width?: number | undefined;
-                height?: number | undefined;
-            }, {
-                width?: number | undefined;
-                height?: number | undefined;
-            }>>;
+            size: z.ZodOptional<z.ZodNumber>;
         }, "strip", z.ZodTypeAny, {
             name?: string | undefined;
-            size?: {
-                width?: number | undefined;
-                height?: number | undefined;
-            } | undefined;
+            size?: number | undefined;
         }, {
             name?: string | undefined;
-            size?: {
-                width?: number | undefined;
-                height?: number | undefined;
-            } | undefined;
+            size?: number | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
         tileset?: {
             name?: string | undefined;
-            size?: {
-                width?: number | undefined;
-                height?: number | undefined;
-            } | undefined;
+            size?: number | undefined;
         } | undefined;
     }, {
         tileset?: {
             name?: string | undefined;
-            size?: {
-                width?: number | undefined;
-                height?: number | undefined;
-            } | undefined;
+            size?: number | undefined;
         } | undefined;
     }>>;
 }, {
@@ -151,28 +103,13 @@ declare const isOptimizeOptions: z.ZodObject<z.extendShape<{
         path: z.ZodOptional<z.ZodString>;
         tileset: z.ZodOptional<z.ZodObject<{
             name: z.ZodOptional<z.ZodString>;
-            size: z.ZodOptional<z.ZodObject<{
-                width: z.ZodOptional<z.ZodNumber>;
-                height: z.ZodOptional<z.ZodNumber>;
-            }, "strip", z.ZodTypeAny, {
-                width?: number | undefined;
-                height?: number | undefined;
-            }, {
-                width?: number | undefined;
-                height?: number | undefined;
-            }>>;
+            size: z.ZodOptional<z.ZodNumber>;
         }, "strip", z.ZodTypeAny, {
             name?: string | undefined;
-            size?: {
-                width?: number | undefined;
-                height?: number | undefined;
-            } | undefined;
+            size?: number | undefined;
         }, {
             name?: string | undefined;
-            size?: {
-                width?: number | undefined;
-                height?: number | undefined;
-            } | undefined;
+            size?: number | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
         path?: string | undefined;
@@ -181,10 +118,7 @@ declare const isOptimizeOptions: z.ZodObject<z.extendShape<{
         } | undefined;
         tileset?: {
             name?: string | undefined;
-            size?: {
-                width?: number | undefined;
-                height?: number | undefined;
-            } | undefined;
+            size?: number | undefined;
         } | undefined;
     }, {
         path?: string | undefined;
@@ -193,10 +127,7 @@ declare const isOptimizeOptions: z.ZodObject<z.extendShape<{
         } | undefined;
         tileset?: {
             name?: string | undefined;
-            size?: {
-                width?: number | undefined;
-                height?: number | undefined;
-            } | undefined;
+            size?: number | undefined;
         } | undefined;
     }>>;
 }>, "strip", z.ZodTypeAny, {
@@ -211,10 +142,7 @@ declare const isOptimizeOptions: z.ZodObject<z.extendShape<{
         } | undefined;
         tileset?: {
             name?: string | undefined;
-            size?: {
-                width?: number | undefined;
-                height?: number | undefined;
-            } | undefined;
+            size?: number | undefined;
         } | undefined;
     } | undefined;
 }, {
@@ -229,10 +157,7 @@ declare const isOptimizeOptions: z.ZodObject<z.extendShape<{
         } | undefined;
         tileset?: {
             name?: string | undefined;
-            size?: {
-                width?: number | undefined;
-                height?: number | undefined;
-            } | undefined;
+            size?: number | undefined;
         } | undefined;
     } | undefined;
 }>;

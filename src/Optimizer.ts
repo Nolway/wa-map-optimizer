@@ -12,8 +12,7 @@ export class Optimizer {
     private currentTilesetOptimization: MapTileset;
     private currentExtractedTiles: Promise<Buffer>[];
     private tileSize: number;
-    private tilesetMaxColumns: number;
-    private tilesetMaxLines: number;
+    private tilesetMaxTileCount: number;
     private tilesetName: string;
     private logLevel: LogLevel;
 
@@ -26,8 +25,7 @@ export class Optimizer {
         this.optimizedTiles = new Map<number, number>();
         this.optimizedTilesets = new Map<MapTileset, Buffer>();
         this.tileSize = options?.tile?.size ?? 32;
-        this.tilesetMaxColumns = (options?.output?.tileset?.size?.width ?? 1024) / this.tileSize;
-        this.tilesetMaxLines = (options?.output?.tileset?.size?.height ?? 1024) / this.tileSize;
+        this.tilesetMaxTileCount = Math.pow(options?.output?.tileset?.size ?? 1024 / this.tileSize, 2);
         this.tilesetName = options?.output?.tileset?.name ?? "chunk";
         this.logLevel = options?.logs ?? LogLevel.NORMAL;
 
@@ -128,10 +126,10 @@ export class Optimizer {
         };
     }
 
-    private async generateNewTilesetBuffer(width: number, height: number): Promise<Buffer> {
+    private async generateNewTilesetBuffer(size: number): Promise<Buffer> {
         const newFile = new PNG({
-            width: width,
-            height: height,
+            width: size,
+            height: size,
         });
 
         return await newFile.pack().pipe(sharp()).toBuffer();
@@ -298,7 +296,7 @@ export class Optimizer {
     }
 
     private async checkCurrentTileset(): Promise<void> {
-        if (this.currentExtractedTiles.length < this.tilesetMaxColumns * this.tilesetMaxLines) {
+        if (this.currentExtractedTiles.length < this.tilesetMaxTileCount) {
             return;
         }
         await this.currentTilesetRendering();
@@ -310,17 +308,15 @@ export class Optimizer {
         }
 
         const tileCount = this.currentExtractedTiles.length;
-        const columnCount = tileCount < this.tilesetMaxColumns ? tileCount : this.tilesetMaxColumns;
-        const lineCount = tileCount < this.tilesetMaxColumns ? 1 : Math.ceil(tileCount / columnCount);
-        const imageWidth = columnCount * this.tileSize;
-        const imageHeight = lineCount * this.tileSize;
+        const size = Math.ceil(Math.sqrt(tileCount));
+        const imageSize = size * this.tileSize;
 
-        this.currentTilesetOptimization.columns = columnCount;
-        this.currentTilesetOptimization.imagewidth = imageWidth;
-        this.currentTilesetOptimization.imageheight = imageHeight;
+        this.currentTilesetOptimization.columns = size;
+        this.currentTilesetOptimization.imagewidth = imageSize;
+        this.currentTilesetOptimization.imageheight = imageSize;
         this.currentTilesetOptimization.tilecount = tileCount;
 
-        const tilesetBuffer = await this.generateNewTilesetBuffer(imageWidth, imageHeight);
+        const tilesetBuffer = await this.generateNewTilesetBuffer(imageSize);
 
         if (this.logLevel === LogLevel.VERBOSE) {
             console.log("Empty image generated");
@@ -345,7 +341,7 @@ export class Optimizer {
         let y = 0;
 
         for (const tileBuffer of tileBuffers) {
-            if (x === imageWidth) {
+            if (x === imageSize) {
                 y += this.tileSize;
                 x = 0;
             }

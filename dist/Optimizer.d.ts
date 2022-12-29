@@ -9,8 +9,7 @@ export declare class Optimizer {
     private currentTilesetOptimization;
     private currentExtractedTiles;
     private tileSize;
-    private tilesetMaxColumns;
-    private tilesetMaxLines;
+    private tilesetMaxTileCount;
     private tilesetName;
     private logLevel;
     constructor(map: MapFormat, tilesetsBuffers: Map<MapTileset, Sharp>, options?: OptimizeBufferOptions | undefined);

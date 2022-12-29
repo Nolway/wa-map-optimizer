@@ -13,7 +13,8 @@ export class Optimizer {
     private currentExtractedTiles: Promise<Buffer>[];
     private tileSize: number;
     private tilesetMaxTileCount: number;
-    private tilesetName: string;
+    private tilesetPrefix: string;
+    private tilesetSuffix?: string;
     private logLevel: LogLevel;
 
     constructor(
@@ -26,7 +27,8 @@ export class Optimizer {
         this.optimizedTilesets = new Map<MapTileset, Buffer>();
         this.tileSize = options?.tile?.size ?? 32;
         this.tilesetMaxTileCount = Math.pow(options?.output?.tileset?.size ?? 1024 / this.tileSize, 2);
-        this.tilesetName = options?.output?.tileset?.name ?? "chunk";
+        this.tilesetPrefix = options?.output?.tileset?.prefix ?? "chunk";
+        this.tilesetSuffix = options?.output?.tileset?.suffix;
         this.logLevel = options?.logs ?? LogLevel.NORMAL;
 
         this.currentTilesetOptimization = this.generateNextTileset();
@@ -112,7 +114,7 @@ export class Optimizer {
         return {
             columns: 1,
             firstgid: this.optimizedTiles.size + 1,
-            image: `${this.tilesetName}-${tilesetCount}.png`,
+            image: `${this.tilesetPrefix}-${tilesetCount}${this.tilesetSuffix ? "-" + this.tilesetSuffix : ""}.png`,
             imageheight: 0,
             imagewidth: 0,
             margin: 0,

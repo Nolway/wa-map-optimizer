@@ -83,8 +83,8 @@ const optimize = async (mapFilePath, options = undefined) => {
         fs_1.default.mkdirSync(ouputPath, { recursive: true });
     }
     const tilesetsPromises = [];
-    for (const tileset of result.tilesetsBuffer) {
-        tilesetsPromises.push(fs_1.default.promises.writeFile(`${ouputPath}/${tileset[0]}`, tileset[1]));
+    for (const [tilesetName, tilesetBuffer] of result.tilesetsBuffer) {
+        tilesetsPromises.push(fs_1.default.promises.writeFile(`${ouputPath}/${tilesetName}`, tilesetBuffer));
     }
     if (logLevel) {
         console.log(`${mapName} file render is in progress!`);

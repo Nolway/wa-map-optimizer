@@ -16,24 +16,29 @@ declare const isOptimizeBufferOptions: z.ZodObject<{
     logs: z.ZodOptional<z.ZodNativeEnum<typeof LogLevel>>;
     output: z.ZodOptional<z.ZodObject<{
         tileset: z.ZodOptional<z.ZodObject<{
-            name: z.ZodOptional<z.ZodString>;
+            prefix: z.ZodOptional<z.ZodString>;
+            suffix: z.ZodOptional<z.ZodString>;
             size: z.ZodOptional<z.ZodNumber>;
         }, "strip", z.ZodTypeAny, {
-            name?: string | undefined;
             size?: number | undefined;
+            prefix?: string | undefined;
+            suffix?: string | undefined;
         }, {
-            name?: string | undefined;
             size?: number | undefined;
+            prefix?: string | undefined;
+            suffix?: string | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
         tileset?: {
-            name?: string | undefined;
             size?: number | undefined;
+            prefix?: string | undefined;
+            suffix?: string | undefined;
         } | undefined;
     }, {
         tileset?: {
-            name?: string | undefined;
             size?: number | undefined;
+            prefix?: string | undefined;
+            suffix?: string | undefined;
         } | undefined;
     }>>;
 }, "strip", z.ZodTypeAny, {
@@ -43,8 +48,9 @@ declare const isOptimizeBufferOptions: z.ZodObject<{
     logs?: LogLevel | undefined;
     output?: {
         tileset?: {
-            name?: string | undefined;
             size?: number | undefined;
+            prefix?: string | undefined;
+            suffix?: string | undefined;
         } | undefined;
     } | undefined;
 }, {
@@ -54,8 +60,9 @@ declare const isOptimizeBufferOptions: z.ZodObject<{
     logs?: LogLevel | undefined;
     output?: {
         tileset?: {
-            name?: string | undefined;
             size?: number | undefined;
+            prefix?: string | undefined;
+            suffix?: string | undefined;
         } | undefined;
     } | undefined;
 }>;
@@ -71,24 +78,29 @@ declare const isOptimizeOptions: z.ZodObject<z.extendShape<{
     logs: z.ZodOptional<z.ZodNativeEnum<typeof LogLevel>>;
     output: z.ZodOptional<z.ZodObject<{
         tileset: z.ZodOptional<z.ZodObject<{
-            name: z.ZodOptional<z.ZodString>;
+            prefix: z.ZodOptional<z.ZodString>;
+            suffix: z.ZodOptional<z.ZodString>;
             size: z.ZodOptional<z.ZodNumber>;
         }, "strip", z.ZodTypeAny, {
-            name?: string | undefined;
             size?: number | undefined;
+            prefix?: string | undefined;
+            suffix?: string | undefined;
         }, {
-            name?: string | undefined;
             size?: number | undefined;
+            prefix?: string | undefined;
+            suffix?: string | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
         tileset?: {
-            name?: string | undefined;
             size?: number | undefined;
+            prefix?: string | undefined;
+            suffix?: string | undefined;
         } | undefined;
     }, {
         tileset?: {
-            name?: string | undefined;
             size?: number | undefined;
+            prefix?: string | undefined;
+            suffix?: string | undefined;
         } | undefined;
     }>>;
 }, {

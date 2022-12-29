@@ -21,7 +21,8 @@ const isOptimizeBufferOptions = zod_1.z.object({
         .object({
         tileset: zod_1.z
             .object({
-            name: zod_1.z.string().optional(),
+            prefix: zod_1.z.string().optional(),
+            suffix: zod_1.z.string().optional(),
             size: zod_1.z.number().gte(32).multipleOf(8).optional(),
         })
             .optional(),

@@ -71,8 +71,8 @@ export const optimize = async (
 
     const tilesetsPromises: Promise<void>[] = [];
 
-    for (const tileset of result.tilesetsBuffer) {
-        tilesetsPromises.push(fs.promises.writeFile(`${ouputPath}/${tileset[0]}`, tileset[1]));
+    for (const [tilesetName, tilesetBuffer] of result.tilesetsBuffer) {
+        tilesetsPromises.push(fs.promises.writeFile(`${ouputPath}/${tilesetName}`, tilesetBuffer));
     }
 
     if (logLevel) {

@@ -10,7 +10,8 @@ export declare class Optimizer {
     private currentExtractedTiles;
     private tileSize;
     private tilesetMaxTileCount;
-    private tilesetName;
+    private tilesetPrefix;
+    private tilesetSuffix?;
     private logLevel;
     constructor(map: MapFormat, tilesetsBuffers: Map<MapTileset, Sharp>, options?: OptimizeBufferOptions | undefined);
     optimize(): Promise<OptimizedMapFiles>;

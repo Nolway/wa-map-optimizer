@@ -1,6 +1,5 @@
 <h1>WA Map Optimizer 💪</h1>
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.2.4-blue.svg?cacheSeconds=2592000" />
   <a href="LICENSE.txt" target="_blank">
     <img alt="License: AGPL--3.0" src="https://img.shields.io/badge/License-AGPL--3.0-yellow.svg" />
   </a>
@@ -49,11 +48,9 @@ async function run() {
             name: "awesome-map",
           },
           tileset: {
-            name: "optimized-tileset",
-            size: {
-              width: 1024,
-              height: 1024,
-            }
+            prefix: "optimized",
+            suffix: "tileset",
+            size: 1024,
           }
       }
     });

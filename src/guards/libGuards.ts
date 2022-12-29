@@ -42,7 +42,8 @@ const isOptimizeOptions = isOptimizeBufferOptions.extend({
             path: z.string().optional(),
             tileset: z
                 .object({
-                    name: z.string().optional(),
+                    prefix: z.string().optional(),
+                    suffix: z.string().optional(),
                     size: z.number().gte(32).multipleOf(8).optional(),
                 })
                 .optional(),

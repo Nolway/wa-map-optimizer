@@ -114,14 +114,17 @@ declare const isOptimizeOptions: z.ZodObject<z.extendShape<{
         }>>;
         path: z.ZodOptional<z.ZodString>;
         tileset: z.ZodOptional<z.ZodObject<{
-            name: z.ZodOptional<z.ZodString>;
+            prefix: z.ZodOptional<z.ZodString>;
+            suffix: z.ZodOptional<z.ZodString>;
             size: z.ZodOptional<z.ZodNumber>;
         }, "strip", z.ZodTypeAny, {
-            name?: string | undefined;
             size?: number | undefined;
+            prefix?: string | undefined;
+            suffix?: string | undefined;
         }, {
-            name?: string | undefined;
             size?: number | undefined;
+            prefix?: string | undefined;
+            suffix?: string | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
         path?: string | undefined;
@@ -129,8 +132,9 @@ declare const isOptimizeOptions: z.ZodObject<z.extendShape<{
             name?: string | undefined;
         } | undefined;
         tileset?: {
-            name?: string | undefined;
             size?: number | undefined;
+            prefix?: string | undefined;
+            suffix?: string | undefined;
         } | undefined;
     }, {
         path?: string | undefined;
@@ -138,8 +142,9 @@ declare const isOptimizeOptions: z.ZodObject<z.extendShape<{
             name?: string | undefined;
         } | undefined;
         tileset?: {
-            name?: string | undefined;
             size?: number | undefined;
+            prefix?: string | undefined;
+            suffix?: string | undefined;
         } | undefined;
     }>>;
 }>, "strip", z.ZodTypeAny, {
@@ -153,8 +158,9 @@ declare const isOptimizeOptions: z.ZodObject<z.extendShape<{
             name?: string | undefined;
         } | undefined;
         tileset?: {
-            name?: string | undefined;
             size?: number | undefined;
+            prefix?: string | undefined;
+            suffix?: string | undefined;
         } | undefined;
     } | undefined;
 }, {
@@ -168,8 +174,9 @@ declare const isOptimizeOptions: z.ZodObject<z.extendShape<{
             name?: string | undefined;
         } | undefined;
         tileset?: {
-            name?: string | undefined;
             size?: number | undefined;
+            prefix?: string | undefined;
+            suffix?: string | undefined;
         } | undefined;
     } | undefined;
 }>;

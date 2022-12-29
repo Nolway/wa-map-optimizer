@@ -5,15 +5,15 @@ export declare const isProperty: z.ZodObject<{
     propertytype: z.ZodOptional<z.ZodString>;
     value: z.ZodUnknown;
 }, "strip", z.ZodTypeAny, {
-    name: string;
-    type: string;
     propertytype?: string | undefined;
     value?: unknown;
+    name: string;
+    type: string;
 }, {
-    name: string;
-    type: string;
     propertytype?: string | undefined;
     value?: unknown;
+    name: string;
+    type: string;
 }>;
 export declare const isMapTilesetTileAnimation: z.ZodObject<{
     duration: z.ZodNumber;
@@ -43,42 +43,42 @@ export declare const isMapTilesetTile: z.ZodObject<{
         propertytype: z.ZodOptional<z.ZodString>;
         value: z.ZodUnknown;
     }, "passthrough", z.ZodTypeAny, {
-        name: string;
-        type: string;
         propertytype?: string | undefined;
         value?: unknown;
+        name: string;
+        type: string;
     }, {
-        name: string;
-        type: string;
         propertytype?: string | undefined;
         value?: unknown;
+        name: string;
+        type: string;
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
     animation?: {
         duration: number;
         tileid: number;
     }[] | undefined;
-    id: number;
     properties?: {
-        name: string;
-        type: string;
         propertytype?: string | undefined;
         value?: unknown;
+        name: string;
+        type: string;
     }[] | undefined;
+    id: number;
 }, {
     animation?: {
         duration: number;
         tileid: number;
     }[] | undefined;
-    id: number;
     properties?: {
-        name: string;
-        type: string;
         propertytype?: string | undefined;
         value?: unknown;
+        name: string;
+        type: string;
     }[] | undefined;
+    id: number;
 }>;
-export declare type MapTilesetTile = z.infer<typeof isMapTilesetTile>;
+export type MapTilesetTile = z.infer<typeof isMapTilesetTile>;
 export declare const isMapTileset: z.ZodObject<{
     columns: z.ZodNumber;
     firstgid: z.ZodNumber;
@@ -93,15 +93,15 @@ export declare const isMapTileset: z.ZodObject<{
         propertytype: z.ZodOptional<z.ZodString>;
         value: z.ZodUnknown;
     }, "passthrough", z.ZodTypeAny, {
-        name: string;
-        type: string;
         propertytype?: string | undefined;
         value?: unknown;
+        name: string;
+        type: string;
     }, {
-        name: string;
-        type: string;
         propertytype?: string | undefined;
         value?: unknown;
+        name: string;
+        type: string;
     }>, "many">>;
     spacing: z.ZodNumber;
     tilecount: z.ZodNumber;
@@ -125,106 +125,106 @@ export declare const isMapTileset: z.ZodObject<{
             propertytype: z.ZodOptional<z.ZodString>;
             value: z.ZodUnknown;
         }, "passthrough", z.ZodTypeAny, {
-            name: string;
-            type: string;
             propertytype?: string | undefined;
             value?: unknown;
+            name: string;
+            type: string;
         }, {
-            name: string;
-            type: string;
             propertytype?: string | undefined;
             value?: unknown;
+            name: string;
+            type: string;
         }>, "many">>;
     }, "passthrough", z.ZodTypeAny, {
         animation?: {
             duration: number;
             tileid: number;
         }[] | undefined;
-        id: number;
         properties?: {
-            name: string;
-            type: string;
             propertytype?: string | undefined;
             value?: unknown;
+            name: string;
+            type: string;
         }[] | undefined;
+        id: number;
     }, {
         animation?: {
             duration: number;
             tileid: number;
         }[] | undefined;
-        id: number;
         properties?: {
-            name: string;
-            type: string;
             propertytype?: string | undefined;
             value?: unknown;
+            name: string;
+            type: string;
         }[] | undefined;
+        id: number;
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
+    properties?: {
+        propertytype?: string | undefined;
+        value?: unknown;
+        name: string;
+        type: string;
+    }[] | undefined;
+    tiles?: {
+        animation?: {
+            duration: number;
+            tileid: number;
+        }[] | undefined;
+        properties?: {
+            propertytype?: string | undefined;
+            value?: unknown;
+            name: string;
+            type: string;
+        }[] | undefined;
+        id: number;
+    }[] | undefined;
+    name: string;
     columns: number;
     firstgid: number;
     image: string;
     imageheight: number;
     imagewidth: number;
     margin: number;
-    name: string;
-    properties?: {
-        name: string;
-        type: string;
-        propertytype?: string | undefined;
-        value?: unknown;
-    }[] | undefined;
     spacing: number;
     tilecount: number;
     tileheight: number;
     tilewidth: number;
-    tiles?: {
-        animation?: {
-            duration: number;
-            tileid: number;
-        }[] | undefined;
-        id: number;
-        properties?: {
-            name: string;
-            type: string;
-            propertytype?: string | undefined;
-            value?: unknown;
-        }[] | undefined;
-    }[] | undefined;
 }, {
+    properties?: {
+        propertytype?: string | undefined;
+        value?: unknown;
+        name: string;
+        type: string;
+    }[] | undefined;
+    tiles?: {
+        animation?: {
+            duration: number;
+            tileid: number;
+        }[] | undefined;
+        properties?: {
+            propertytype?: string | undefined;
+            value?: unknown;
+            name: string;
+            type: string;
+        }[] | undefined;
+        id: number;
+    }[] | undefined;
+    name: string;
     columns: number;
     firstgid: number;
     image: string;
     imageheight: number;
     imagewidth: number;
     margin: number;
-    name: string;
-    properties?: {
-        name: string;
-        type: string;
-        propertytype?: string | undefined;
-        value?: unknown;
-    }[] | undefined;
     spacing: number;
     tilecount: number;
     tileheight: number;
     tilewidth: number;
-    tiles?: {
-        animation?: {
-            duration: number;
-            tileid: number;
-        }[] | undefined;
-        id: number;
-        properties?: {
-            name: string;
-            type: string;
-            propertytype?: string | undefined;
-            value?: unknown;
-        }[] | undefined;
-    }[] | undefined;
 }>;
-export declare type MapTileset = z.infer<typeof isMapTileset>;
-export declare type MapLayer = {
+export type MapTileset = z.infer<typeof isMapTileset>;
+export type MapLayer = {
     type?: string;
     layers?: MapLayer[];
     data?: number[];
@@ -245,15 +245,15 @@ export declare const isMap: z.ZodObject<{
             propertytype: z.ZodOptional<z.ZodString>;
             value: z.ZodUnknown;
         }, "passthrough", z.ZodTypeAny, {
-            name: string;
-            type: string;
             propertytype?: string | undefined;
             value?: unknown;
+            name: string;
+            type: string;
         }, {
-            name: string;
-            type: string;
             propertytype?: string | undefined;
             value?: unknown;
+            name: string;
+            type: string;
         }>, "many">>;
         spacing: z.ZodNumber;
         tilecount: z.ZodNumber;
@@ -277,103 +277,103 @@ export declare const isMap: z.ZodObject<{
                 propertytype: z.ZodOptional<z.ZodString>;
                 value: z.ZodUnknown;
             }, "passthrough", z.ZodTypeAny, {
-                name: string;
-                type: string;
                 propertytype?: string | undefined;
                 value?: unknown;
+                name: string;
+                type: string;
             }, {
-                name: string;
-                type: string;
                 propertytype?: string | undefined;
                 value?: unknown;
+                name: string;
+                type: string;
             }>, "many">>;
         }, "passthrough", z.ZodTypeAny, {
             animation?: {
                 duration: number;
                 tileid: number;
             }[] | undefined;
-            id: number;
             properties?: {
-                name: string;
-                type: string;
                 propertytype?: string | undefined;
                 value?: unknown;
+                name: string;
+                type: string;
             }[] | undefined;
+            id: number;
         }, {
             animation?: {
                 duration: number;
                 tileid: number;
             }[] | undefined;
-            id: number;
             properties?: {
-                name: string;
-                type: string;
                 propertytype?: string | undefined;
                 value?: unknown;
+                name: string;
+                type: string;
             }[] | undefined;
+            id: number;
         }>, "many">>;
     }, "passthrough", z.ZodTypeAny, {
+        properties?: {
+            propertytype?: string | undefined;
+            value?: unknown;
+            name: string;
+            type: string;
+        }[] | undefined;
+        tiles?: {
+            animation?: {
+                duration: number;
+                tileid: number;
+            }[] | undefined;
+            properties?: {
+                propertytype?: string | undefined;
+                value?: unknown;
+                name: string;
+                type: string;
+            }[] | undefined;
+            id: number;
+        }[] | undefined;
+        name: string;
         columns: number;
         firstgid: number;
         image: string;
         imageheight: number;
         imagewidth: number;
         margin: number;
-        name: string;
-        properties?: {
-            name: string;
-            type: string;
-            propertytype?: string | undefined;
-            value?: unknown;
-        }[] | undefined;
         spacing: number;
         tilecount: number;
         tileheight: number;
         tilewidth: number;
-        tiles?: {
-            animation?: {
-                duration: number;
-                tileid: number;
-            }[] | undefined;
-            id: number;
-            properties?: {
-                name: string;
-                type: string;
-                propertytype?: string | undefined;
-                value?: unknown;
-            }[] | undefined;
-        }[] | undefined;
     }, {
+        properties?: {
+            propertytype?: string | undefined;
+            value?: unknown;
+            name: string;
+            type: string;
+        }[] | undefined;
+        tiles?: {
+            animation?: {
+                duration: number;
+                tileid: number;
+            }[] | undefined;
+            properties?: {
+                propertytype?: string | undefined;
+                value?: unknown;
+                name: string;
+                type: string;
+            }[] | undefined;
+            id: number;
+        }[] | undefined;
+        name: string;
         columns: number;
         firstgid: number;
         image: string;
         imageheight: number;
         imagewidth: number;
         margin: number;
-        name: string;
-        properties?: {
-            name: string;
-            type: string;
-            propertytype?: string | undefined;
-            value?: unknown;
-        }[] | undefined;
         spacing: number;
         tilecount: number;
         tileheight: number;
         tilewidth: number;
-        tiles?: {
-            animation?: {
-                duration: number;
-                tileid: number;
-            }[] | undefined;
-            id: number;
-            properties?: {
-                name: string;
-                type: string;
-                propertytype?: string | undefined;
-                value?: unknown;
-            }[] | undefined;
-        }[] | undefined;
     }>, "many">;
     type: z.ZodLiteral<"map">;
     tileheight: z.ZodNumber;
@@ -384,102 +384,102 @@ export declare const isMap: z.ZodObject<{
         propertytype: z.ZodOptional<z.ZodString>;
         value: z.ZodUnknown;
     }, "passthrough", z.ZodTypeAny, {
-        name: string;
-        type: string;
         propertytype?: string | undefined;
         value?: unknown;
+        name: string;
+        type: string;
     }, {
-        name: string;
-        type: string;
         propertytype?: string | undefined;
         value?: unknown;
+        name: string;
+        type: string;
     }>, "many">>;
     layers: z.ZodArray<z.ZodType<MapLayer, z.ZodTypeDef, MapLayer>, "many">;
 }, "strip", z.ZodTypeAny, {
+    properties?: {
+        propertytype?: string | undefined;
+        value?: unknown;
+        name: string;
+        type: string;
+    }[] | undefined;
+    type: "map";
+    tileheight: number;
+    tilewidth: number;
+    layers: MapLayer[];
     tilesets: {
+        properties?: {
+            propertytype?: string | undefined;
+            value?: unknown;
+            name: string;
+            type: string;
+        }[] | undefined;
+        tiles?: {
+            animation?: {
+                duration: number;
+                tileid: number;
+            }[] | undefined;
+            properties?: {
+                propertytype?: string | undefined;
+                value?: unknown;
+                name: string;
+                type: string;
+            }[] | undefined;
+            id: number;
+        }[] | undefined;
+        name: string;
         columns: number;
         firstgid: number;
         image: string;
         imageheight: number;
         imagewidth: number;
         margin: number;
-        name: string;
-        properties?: {
-            name: string;
-            type: string;
-            propertytype?: string | undefined;
-            value?: unknown;
-        }[] | undefined;
         spacing: number;
         tilecount: number;
         tileheight: number;
         tilewidth: number;
-        tiles?: {
-            animation?: {
-                duration: number;
-                tileid: number;
-            }[] | undefined;
-            id: number;
-            properties?: {
-                name: string;
-                type: string;
-                propertytype?: string | undefined;
-                value?: unknown;
-            }[] | undefined;
-        }[] | undefined;
     }[];
-    type: "map";
-    tileheight: number;
-    tilewidth: number;
-    properties?: {
-        name: string;
-        type: string;
-        propertytype?: string | undefined;
-        value?: unknown;
-    }[] | undefined;
-    layers: MapLayer[];
 }, {
+    properties?: {
+        propertytype?: string | undefined;
+        value?: unknown;
+        name: string;
+        type: string;
+    }[] | undefined;
+    type: "map";
+    tileheight: number;
+    tilewidth: number;
+    layers: MapLayer[];
     tilesets: {
+        properties?: {
+            propertytype?: string | undefined;
+            value?: unknown;
+            name: string;
+            type: string;
+        }[] | undefined;
+        tiles?: {
+            animation?: {
+                duration: number;
+                tileid: number;
+            }[] | undefined;
+            properties?: {
+                propertytype?: string | undefined;
+                value?: unknown;
+                name: string;
+                type: string;
+            }[] | undefined;
+            id: number;
+        }[] | undefined;
+        name: string;
         columns: number;
         firstgid: number;
         image: string;
         imageheight: number;
         imagewidth: number;
         margin: number;
-        name: string;
-        properties?: {
-            name: string;
-            type: string;
-            propertytype?: string | undefined;
-            value?: unknown;
-        }[] | undefined;
         spacing: number;
         tilecount: number;
         tileheight: number;
         tilewidth: number;
-        tiles?: {
-            animation?: {
-                duration: number;
-                tileid: number;
-            }[] | undefined;
-            id: number;
-            properties?: {
-                name: string;
-                type: string;
-                propertytype?: string | undefined;
-                value?: unknown;
-            }[] | undefined;
-        }[] | undefined;
     }[];
-    type: "map";
-    tileheight: number;
-    tilewidth: number;
-    properties?: {
-        name: string;
-        type: string;
-        propertytype?: string | undefined;
-        value?: unknown;
-    }[] | undefined;
-    layers: MapLayer[];
 }>;
-export declare type Map = z.infer<typeof isMap>;
+export type Map = z.infer<typeof isMap>;

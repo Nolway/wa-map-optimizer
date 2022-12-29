@@ -78,7 +78,7 @@ const optimize = async (mapFilePath, options = undefined) => {
     const optimizer = new Optimizer_1.Optimizer(map, tilesets, options);
     const result = await optimizer.optimize();
     const outputMapName = (options?.output?.map?.name ?? mapName) + mapExtension;
-    const ouputPath = mapDirectoyPath + "/" + (options?.output?.path ?? "dist");
+    const ouputPath = options?.output?.path ?? `${mapDirectoyPath}/dist`;
     if (!fs_1.default.existsSync(ouputPath)) {
         fs_1.default.mkdirSync(ouputPath, { recursive: true });
     }

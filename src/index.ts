@@ -63,7 +63,7 @@ export const optimize = async (
     const result = await optimizer.optimize();
 
     const outputMapName = (options?.output?.map?.name ?? mapName) + mapExtension;
-    const ouputPath = mapDirectoyPath + "/" + (options?.output?.path ?? "dist");
+    const ouputPath = options?.output?.path ?? `${mapDirectoyPath}/dist`;
 
     if (!fs.existsSync(ouputPath)) {
         fs.mkdirSync(ouputPath, { recursive: true });

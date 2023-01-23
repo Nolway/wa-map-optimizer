@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { isMap } from "./mapGuards";
 
 export enum LogLevel {
     NONE = 0,
@@ -52,10 +51,3 @@ const isOptimizeOptions = isOptimizeBufferOptions.extend({
 });
 
 export type OptimizeOptions = z.infer<typeof isOptimizeOptions>;
-
-const isOptimizedMapFiles = z.object({
-    map: isMap,
-    tilesetsBuffer: z.map(z.string(), z.instanceof(Buffer)),
-});
-
-export type OptimizedMapFiles = z.infer<typeof isOptimizedMapFiles>;

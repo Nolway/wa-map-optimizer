@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogLevel = void 0;
 const zod_1 = require("zod");
-const mapGuards_1 = require("./mapGuards");
 var LogLevel;
 (function (LogLevel) {
     LogLevel[LogLevel["NONE"] = 0] = "NONE";
@@ -47,8 +46,4 @@ const isOptimizeOptions = isOptimizeBufferOptions.extend({
             .optional(),
     })
         .optional(),
-});
-const isOptimizedMapFiles = zod_1.z.object({
-    map: mapGuards_1.isMap,
-    tilesetsBuffer: zod_1.z.map(zod_1.z.string(), zod_1.z.instanceof(Buffer)),
 });

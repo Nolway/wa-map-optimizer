@@ -5,15 +5,15 @@ export declare const isProperty: z.ZodObject<{
     propertytype: z.ZodOptional<z.ZodString>;
     value: z.ZodUnknown;
 }, "strip", z.ZodTypeAny, {
-    propertytype?: string | undefined;
     value?: unknown;
-    name: string;
+    propertytype?: string | undefined;
     type: string;
+    name: string;
 }, {
-    propertytype?: string | undefined;
     value?: unknown;
-    name: string;
+    propertytype?: string | undefined;
     type: string;
+    name: string;
 }>;
 export declare const isMapTilesetTileAnimation: z.ZodObject<{
     duration: z.ZodNumber;
@@ -43,15 +43,15 @@ export declare const isMapTilesetTile: z.ZodObject<{
         propertytype: z.ZodOptional<z.ZodString>;
         value: z.ZodUnknown;
     }, "passthrough", z.ZodTypeAny, {
-        propertytype?: string | undefined;
         value?: unknown;
-        name: string;
+        propertytype?: string | undefined;
         type: string;
+        name: string;
     }, {
-        propertytype?: string | undefined;
         value?: unknown;
-        name: string;
+        propertytype?: string | undefined;
         type: string;
+        name: string;
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
     animation?: {
@@ -59,10 +59,10 @@ export declare const isMapTilesetTile: z.ZodObject<{
         tileid: number;
     }[] | undefined;
     properties?: {
-        propertytype?: string | undefined;
         value?: unknown;
-        name: string;
+        propertytype?: string | undefined;
         type: string;
+        name: string;
     }[] | undefined;
     id: number;
 }, {
@@ -71,10 +71,10 @@ export declare const isMapTilesetTile: z.ZodObject<{
         tileid: number;
     }[] | undefined;
     properties?: {
-        propertytype?: string | undefined;
         value?: unknown;
-        name: string;
+        propertytype?: string | undefined;
         type: string;
+        name: string;
     }[] | undefined;
     id: number;
 }>;
@@ -93,15 +93,15 @@ export declare const isMapTileset: z.ZodObject<{
         propertytype: z.ZodOptional<z.ZodString>;
         value: z.ZodUnknown;
     }, "passthrough", z.ZodTypeAny, {
-        propertytype?: string | undefined;
         value?: unknown;
-        name: string;
+        propertytype?: string | undefined;
         type: string;
+        name: string;
     }, {
-        propertytype?: string | undefined;
         value?: unknown;
-        name: string;
+        propertytype?: string | undefined;
         type: string;
+        name: string;
     }>, "many">>;
     spacing: z.ZodNumber;
     tilecount: z.ZodNumber;
@@ -125,15 +125,15 @@ export declare const isMapTileset: z.ZodObject<{
             propertytype: z.ZodOptional<z.ZodString>;
             value: z.ZodUnknown;
         }, "passthrough", z.ZodTypeAny, {
-            propertytype?: string | undefined;
             value?: unknown;
-            name: string;
+            propertytype?: string | undefined;
             type: string;
+            name: string;
         }, {
-            propertytype?: string | undefined;
             value?: unknown;
-            name: string;
+            propertytype?: string | undefined;
             type: string;
+            name: string;
         }>, "many">>;
     }, "passthrough", z.ZodTypeAny, {
         animation?: {
@@ -141,10 +141,10 @@ export declare const isMapTileset: z.ZodObject<{
             tileid: number;
         }[] | undefined;
         properties?: {
-            propertytype?: string | undefined;
             value?: unknown;
-            name: string;
+            propertytype?: string | undefined;
             type: string;
+            name: string;
         }[] | undefined;
         id: number;
     }, {
@@ -153,19 +153,19 @@ export declare const isMapTileset: z.ZodObject<{
             tileid: number;
         }[] | undefined;
         properties?: {
-            propertytype?: string | undefined;
             value?: unknown;
-            name: string;
+            propertytype?: string | undefined;
             type: string;
+            name: string;
         }[] | undefined;
         id: number;
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
     properties?: {
-        propertytype?: string | undefined;
         value?: unknown;
-        name: string;
+        propertytype?: string | undefined;
         type: string;
+        name: string;
     }[] | undefined;
     tiles?: {
         animation?: {
@@ -173,10 +173,10 @@ export declare const isMapTileset: z.ZodObject<{
             tileid: number;
         }[] | undefined;
         properties?: {
-            propertytype?: string | undefined;
             value?: unknown;
-            name: string;
+            propertytype?: string | undefined;
             type: string;
+            name: string;
         }[] | undefined;
         id: number;
     }[] | undefined;
@@ -193,10 +193,10 @@ export declare const isMapTileset: z.ZodObject<{
     tilewidth: number;
 }, {
     properties?: {
-        propertytype?: string | undefined;
         value?: unknown;
-        name: string;
+        propertytype?: string | undefined;
         type: string;
+        name: string;
     }[] | undefined;
     tiles?: {
         animation?: {
@@ -204,10 +204,10 @@ export declare const isMapTileset: z.ZodObject<{
             tileid: number;
         }[] | undefined;
         properties?: {
-            propertytype?: string | undefined;
             value?: unknown;
-            name: string;
+            propertytype?: string | undefined;
             type: string;
+            name: string;
         }[] | undefined;
         id: number;
     }[] | undefined;
@@ -245,15 +245,15 @@ export declare const isMap: z.ZodObject<{
             propertytype: z.ZodOptional<z.ZodString>;
             value: z.ZodUnknown;
         }, "passthrough", z.ZodTypeAny, {
-            propertytype?: string | undefined;
             value?: unknown;
-            name: string;
+            propertytype?: string | undefined;
             type: string;
+            name: string;
         }, {
-            propertytype?: string | undefined;
             value?: unknown;
-            name: string;
+            propertytype?: string | undefined;
             type: string;
+            name: string;
         }>, "many">>;
         spacing: z.ZodNumber;
         tilecount: z.ZodNumber;
@@ -277,15 +277,15 @@ export declare const isMap: z.ZodObject<{
                 propertytype: z.ZodOptional<z.ZodString>;
                 value: z.ZodUnknown;
             }, "passthrough", z.ZodTypeAny, {
-                propertytype?: string | undefined;
                 value?: unknown;
-                name: string;
+                propertytype?: string | undefined;
                 type: string;
+                name: string;
             }, {
-                propertytype?: string | undefined;
                 value?: unknown;
-                name: string;
+                propertytype?: string | undefined;
                 type: string;
+                name: string;
             }>, "many">>;
         }, "passthrough", z.ZodTypeAny, {
             animation?: {
@@ -293,10 +293,10 @@ export declare const isMap: z.ZodObject<{
                 tileid: number;
             }[] | undefined;
             properties?: {
-                propertytype?: string | undefined;
                 value?: unknown;
-                name: string;
+                propertytype?: string | undefined;
                 type: string;
+                name: string;
             }[] | undefined;
             id: number;
         }, {
@@ -305,19 +305,19 @@ export declare const isMap: z.ZodObject<{
                 tileid: number;
             }[] | undefined;
             properties?: {
-                propertytype?: string | undefined;
                 value?: unknown;
-                name: string;
+                propertytype?: string | undefined;
                 type: string;
+                name: string;
             }[] | undefined;
             id: number;
         }>, "many">>;
     }, "passthrough", z.ZodTypeAny, {
         properties?: {
-            propertytype?: string | undefined;
             value?: unknown;
-            name: string;
+            propertytype?: string | undefined;
             type: string;
+            name: string;
         }[] | undefined;
         tiles?: {
             animation?: {
@@ -325,10 +325,10 @@ export declare const isMap: z.ZodObject<{
                 tileid: number;
             }[] | undefined;
             properties?: {
-                propertytype?: string | undefined;
                 value?: unknown;
-                name: string;
+                propertytype?: string | undefined;
                 type: string;
+                name: string;
             }[] | undefined;
             id: number;
         }[] | undefined;
@@ -345,10 +345,10 @@ export declare const isMap: z.ZodObject<{
         tilewidth: number;
     }, {
         properties?: {
-            propertytype?: string | undefined;
             value?: unknown;
-            name: string;
+            propertytype?: string | undefined;
             type: string;
+            name: string;
         }[] | undefined;
         tiles?: {
             animation?: {
@@ -356,10 +356,10 @@ export declare const isMap: z.ZodObject<{
                 tileid: number;
             }[] | undefined;
             properties?: {
-                propertytype?: string | undefined;
                 value?: unknown;
-                name: string;
+                propertytype?: string | undefined;
                 type: string;
+                name: string;
             }[] | undefined;
             id: number;
         }[] | undefined;
@@ -384,23 +384,23 @@ export declare const isMap: z.ZodObject<{
         propertytype: z.ZodOptional<z.ZodString>;
         value: z.ZodUnknown;
     }, "passthrough", z.ZodTypeAny, {
-        propertytype?: string | undefined;
         value?: unknown;
-        name: string;
+        propertytype?: string | undefined;
         type: string;
+        name: string;
     }, {
-        propertytype?: string | undefined;
         value?: unknown;
-        name: string;
+        propertytype?: string | undefined;
         type: string;
+        name: string;
     }>, "many">>;
     layers: z.ZodArray<z.ZodType<MapLayer, z.ZodTypeDef, MapLayer>, "many">;
 }, "strip", z.ZodTypeAny, {
     properties?: {
-        propertytype?: string | undefined;
         value?: unknown;
-        name: string;
+        propertytype?: string | undefined;
         type: string;
+        name: string;
     }[] | undefined;
     type: "map";
     tileheight: number;
@@ -408,10 +408,10 @@ export declare const isMap: z.ZodObject<{
     layers: MapLayer[];
     tilesets: {
         properties?: {
-            propertytype?: string | undefined;
             value?: unknown;
-            name: string;
+            propertytype?: string | undefined;
             type: string;
+            name: string;
         }[] | undefined;
         tiles?: {
             animation?: {
@@ -419,10 +419,10 @@ export declare const isMap: z.ZodObject<{
                 tileid: number;
             }[] | undefined;
             properties?: {
-                propertytype?: string | undefined;
                 value?: unknown;
-                name: string;
+                propertytype?: string | undefined;
                 type: string;
+                name: string;
             }[] | undefined;
             id: number;
         }[] | undefined;
@@ -440,10 +440,10 @@ export declare const isMap: z.ZodObject<{
     }[];
 }, {
     properties?: {
-        propertytype?: string | undefined;
         value?: unknown;
-        name: string;
+        propertytype?: string | undefined;
         type: string;
+        name: string;
     }[] | undefined;
     type: "map";
     tileheight: number;
@@ -451,10 +451,10 @@ export declare const isMap: z.ZodObject<{
     layers: MapLayer[];
     tilesets: {
         properties?: {
-            propertytype?: string | undefined;
             value?: unknown;
-            name: string;
+            propertytype?: string | undefined;
             type: string;
+            name: string;
         }[] | undefined;
         tiles?: {
             animation?: {
@@ -462,10 +462,10 @@ export declare const isMap: z.ZodObject<{
                 tileid: number;
             }[] | undefined;
             properties?: {
-                propertytype?: string | undefined;
                 value?: unknown;
-                name: string;
+                propertytype?: string | undefined;
                 type: string;
+                name: string;
             }[] | undefined;
             id: number;
         }[] | undefined;

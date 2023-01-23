@@ -26,7 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.optimizeToBuffer = exports.optimize = void 0;
+exports.optimize = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importStar(require("path"));
 const sharp_1 = __importDefault(require("sharp"));
@@ -50,7 +50,7 @@ async function getMap(mapFilePath) {
 }
 const optimize = async (mapFilePath, options = undefined) => {
     const map = await getMap(mapFilePath);
-    const mapDirectoyPath = (0, path_1.resolve)(mapFilePath.substring(0, mapFilePath.lastIndexOf("/")));
+    const mapDirectoryPath = (0, path_1.resolve)(mapFilePath.substring(0, mapFilePath.lastIndexOf("/")));
     const tilesets = new Map();
     const mapName = path_1.default.parse(mapFilePath).name;
     const mapExtension = path_1.default.parse(mapFilePath).ext;
@@ -60,7 +60,7 @@ const optimize = async (mapFilePath, options = undefined) => {
     }
     for (const tileset of map.tilesets) {
         try {
-            const { data, info } = await (0, sharp_1.default)((0, path_1.resolve)(`${mapDirectoyPath}/${tileset.image}`))
+            const { data, info } = await (0, sharp_1.default)((0, path_1.resolve)(`${mapDirectoryPath}/${tileset.image}`))
                 .raw()
                 .toBuffer({ resolveWithObject: true });
             tilesets.set(tileset, (0, sharp_1.default)(new Uint8ClampedArray(data.buffer), {
@@ -75,39 +75,18 @@ const optimize = async (mapFilePath, options = undefined) => {
             throw Error(`Undefined tileset file: ${tileset.image}`);
         }
     }
-    const optimizer = new Optimizer_1.Optimizer(map, tilesets, options);
-    const result = await optimizer.optimize();
+    const outputPath = options?.output?.path ?? `${mapDirectoryPath}/dist`;
+    if (!fs_1.default.existsSync(outputPath)) {
+        fs_1.default.mkdirSync(outputPath, { recursive: true });
+    }
+    const optimizer = new Optimizer_1.Optimizer(map, tilesets, options, outputPath);
+    await optimizer.optimize();
     const outputMapName = (options?.output?.map?.name ?? mapName) + mapExtension;
-    const ouputPath = options?.output?.path ?? `${mapDirectoyPath}/dist`;
-    if (!fs_1.default.existsSync(ouputPath)) {
-        fs_1.default.mkdirSync(ouputPath, { recursive: true });
-    }
-    const tilesetsPromises = [];
-    for (const [tilesetName, tilesetBuffer] of result.tilesetsBuffer) {
-        tilesetsPromises.push(fs_1.default.promises.writeFile(`${ouputPath}/${tilesetName}`, tilesetBuffer));
-    }
     if (logLevel) {
-        console.log(`${mapName} file render is in progress!`);
+        console.log(`${mapName} map file render in progress!`);
     }
-    await Promise.all([
-        fs_1.default.promises.writeFile(`${ouputPath}/${outputMapName}`, JSON.stringify(map, null, 0)),
-        ...tilesetsPromises,
-    ]);
+    await fs_1.default.promises.writeFile(`${outputPath}/${outputMapName}`, JSON.stringify(map, null, 0)).then(() => {
+        console.log(`${mapName} map file rendered!`);
+    });
 };
 exports.optimize = optimize;
-const optimizeToBuffer = async (map, tilesetsBuffers, options = undefined) => {
-    const tilesets = new Map();
-    for (const tileset of tilesetsBuffers.keys()) {
-        const { data, info } = await (0, sharp_1.default)(tilesetsBuffers.get(tileset)).raw().toBuffer({ resolveWithObject: true });
-        tilesets.set(tileset, (0, sharp_1.default)(new Uint8ClampedArray(data.buffer), {
-            raw: {
-                width: info.width,
-                height: info.height,
-                channels: info.channels,
-            },
-        }).png());
-    }
-    const optimizer = new Optimizer_1.Optimizer(map, tilesets, options);
-    return await optimizer.optimize();
-};
-exports.optimizeToBuffer = optimizeToBuffer;

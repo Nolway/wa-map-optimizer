@@ -1,6 +1,6 @@
 import { PNG } from "pngjs";
 import sharp, { Sharp } from "sharp";
-import { LogLevel, OptimizeBufferOptions, OptimizedMapFiles } from "./guards/libGuards";
+import { LogLevel, OptimizeBufferOptions } from "./guards/libGuards";
 import { Map as MapFormat, MapLayer, MapTileset, MapTilesetTile } from "./guards/mapGuards";
 
 sharp.cache(false);
@@ -8,10 +8,11 @@ sharp.cache(false);
 export class Optimizer {
     private optimizedMap: MapFormat;
     private optimizedTiles: Map<number, number>;
-    private optimizedTilesets: Map<MapTileset, Buffer>;
+    private optimizedTilesets: MapTileset[];
     private currentTilesetOptimization: MapTileset;
     private currentExtractedTiles: Promise<Buffer>[];
     private tileSize: number;
+    private outputSize: number;
     private tilesetMaxTileCount: number;
     private tilesetPrefix: string;
     private tilesetSuffix?: string;
@@ -20,13 +21,15 @@ export class Optimizer {
     constructor(
         map: MapFormat,
         private readonly tilesetsBuffers: Map<MapTileset, Sharp>,
-        options: OptimizeBufferOptions | undefined = undefined
+        options: OptimizeBufferOptions | undefined = undefined,
+        private readonly outputPath: string
     ) {
         this.optimizedMap = map;
         this.optimizedTiles = new Map<number, number>();
-        this.optimizedTilesets = new Map<MapTileset, Buffer>();
+        this.optimizedTilesets = [];
         this.tileSize = options?.tile?.size ?? 32;
-        this.tilesetMaxTileCount = Math.pow(options?.output?.tileset?.size ?? 1024 / this.tileSize, 2);
+        this.outputSize = options?.output?.tileset?.size ? options?.output?.tileset?.size : 512;
+        this.tilesetMaxTileCount = (this.outputSize * this.outputSize) / this.tileSize;
         this.tilesetPrefix = options?.output?.tileset?.prefix ?? "chunk";
         this.tilesetSuffix = options?.output?.tileset?.suffix;
         this.logLevel = options?.logs ?? LogLevel.NORMAL;
@@ -41,7 +44,7 @@ export class Optimizer {
         }
     }
 
-    public async optimize(): Promise<OptimizedMapFiles> {
+    public async optimize(): Promise<MapFormat> {
         if (this.logLevel) {
             console.log("Start tiles optimization...");
         }
@@ -50,22 +53,17 @@ export class Optimizer {
 
         await this.currentTilesetRendering();
 
-        const tilesetsBuffer = new Map<string, Buffer>();
         this.optimizedMap.tilesets = [];
 
         for (const currentTileset of this.optimizedTilesets) {
-            this.optimizedMap.tilesets.push(currentTileset[0]);
-            tilesetsBuffer.set(currentTileset[0].image, currentTileset[1]);
+            this.optimizedMap.tilesets.push(currentTileset);
         }
 
         if (this.logLevel) {
             console.log("Tiles optimization has been done");
         }
 
-        return {
-            map: this.optimizedMap,
-            tilesetsBuffer,
-        };
+        return this.optimizedMap;
     }
 
     private async optimizeLayers(layers: MapLayer[]): Promise<void> {
@@ -110,7 +108,7 @@ export class Optimizer {
             console.log("Generate a new tileset data");
         }
 
-        const tilesetCount = this.optimizedTilesets.size + 1;
+        const tilesetCount = this.optimizedTilesets.length + 1;
         return {
             columns: 1,
             firstgid: this.optimizedTiles.size + 1,
@@ -309,16 +307,12 @@ export class Optimizer {
             console.log(`Rendering of ${this.currentTilesetOptimization.name} tileset...`);
         }
 
-        const tileCount = this.currentExtractedTiles.length;
-        const size = Math.ceil(Math.sqrt(tileCount));
-        const imageSize = size * this.tileSize;
+        this.currentTilesetOptimization.columns = Math.floor(this.outputSize / this.tileSize);
+        this.currentTilesetOptimization.imagewidth = this.outputSize;
+        this.currentTilesetOptimization.imageheight = this.outputSize;
+        this.currentTilesetOptimization.tilecount = this.currentExtractedTiles.length;
 
-        this.currentTilesetOptimization.columns = size;
-        this.currentTilesetOptimization.imagewidth = imageSize;
-        this.currentTilesetOptimization.imageheight = imageSize;
-        this.currentTilesetOptimization.tilecount = tileCount;
-
-        const tilesetBuffer = await this.generateNewTilesetBuffer(imageSize);
+        const tilesetBuffer = await this.generateNewTilesetBuffer(this.outputSize);
 
         if (this.logLevel === LogLevel.VERBOSE) {
             console.log("Empty image generated");
@@ -343,7 +337,7 @@ export class Optimizer {
         let y = 0;
 
         for (const tileBuffer of tileBuffers) {
-            if (x === imageSize) {
+            if (x === this.outputSize) {
                 y += this.tileSize;
                 x = 0;
             }
@@ -357,10 +351,11 @@ export class Optimizer {
             x += this.tileSize;
         }
 
-        this.optimizedTilesets.set(
-            this.currentTilesetOptimization,
-            await sharpTileset.composite(sharpComposites).toBuffer()
-        );
+        await sharpTileset
+            .composite(sharpComposites)
+            .toFile(`${this.outputPath}/${this.currentTilesetOptimization.image}`);
+
+        this.optimizedTilesets.push(this.currentTilesetOptimization);
 
         if (this.logLevel === LogLevel.VERBOSE) {
             console.log("Tileset optimized image generated");

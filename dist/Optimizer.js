@@ -10,23 +10,27 @@ const libGuards_1 = require("./guards/libGuards");
 sharp_1.default.cache(false);
 class Optimizer {
     tilesetsBuffers;
+    outputPath;
     optimizedMap;
     optimizedTiles;
     optimizedTilesets;
     currentTilesetOptimization;
     currentExtractedTiles;
     tileSize;
+    outputSize;
     tilesetMaxTileCount;
     tilesetPrefix;
     tilesetSuffix;
     logLevel;
-    constructor(map, tilesetsBuffers, options = undefined) {
+    constructor(map, tilesetsBuffers, options = undefined, outputPath) {
         this.tilesetsBuffers = tilesetsBuffers;
+        this.outputPath = outputPath;
         this.optimizedMap = map;
         this.optimizedTiles = new Map();
-        this.optimizedTilesets = new Map();
+        this.optimizedTilesets = [];
         this.tileSize = options?.tile?.size ?? 32;
-        this.tilesetMaxTileCount = Math.pow(options?.output?.tileset?.size ?? 1024 / this.tileSize, 2);
+        this.outputSize = options?.output?.tileset?.size ? options?.output?.tileset?.size : 512;
+        this.tilesetMaxTileCount = (this.outputSize * this.outputSize) / this.tileSize;
         this.tilesetPrefix = options?.output?.tileset?.prefix ?? "chunk";
         this.tilesetSuffix = options?.output?.tileset?.suffix;
         this.logLevel = options?.logs ?? libGuards_1.LogLevel.NORMAL;
@@ -44,19 +48,14 @@ class Optimizer {
         }
         await this.optimizeLayers(this.optimizedMap.layers);
         await this.currentTilesetRendering();
-        const tilesetsBuffer = new Map();
         this.optimizedMap.tilesets = [];
         for (const currentTileset of this.optimizedTilesets) {
-            this.optimizedMap.tilesets.push(currentTileset[0]);
-            tilesetsBuffer.set(currentTileset[0].image, currentTileset[1]);
+            this.optimizedMap.tilesets.push(currentTileset);
         }
         if (this.logLevel) {
             console.log("Tiles optimization has been done");
         }
-        return {
-            map: this.optimizedMap,
-            tilesetsBuffer,
-        };
+        return this.optimizedMap;
     }
     async optimizeLayers(layers) {
         for (let i = 0; i < layers.length; i++) {
@@ -89,7 +88,7 @@ class Optimizer {
         if (this.logLevel === libGuards_1.LogLevel.VERBOSE) {
             console.log("Generate a new tileset data");
         }
-        const tilesetCount = this.optimizedTilesets.size + 1;
+        const tilesetCount = this.optimizedTilesets.length + 1;
         return {
             columns: 1,
             firstgid: this.optimizedTiles.size + 1,
@@ -256,14 +255,11 @@ class Optimizer {
         if (this.logLevel) {
             console.log(`Rendering of ${this.currentTilesetOptimization.name} tileset...`);
         }
-        const tileCount = this.currentExtractedTiles.length;
-        const size = Math.ceil(Math.sqrt(tileCount));
-        const imageSize = size * this.tileSize;
-        this.currentTilesetOptimization.columns = size;
-        this.currentTilesetOptimization.imagewidth = imageSize;
-        this.currentTilesetOptimization.imageheight = imageSize;
-        this.currentTilesetOptimization.tilecount = tileCount;
-        const tilesetBuffer = await this.generateNewTilesetBuffer(imageSize);
+        this.currentTilesetOptimization.columns = Math.floor(this.outputSize / this.tileSize);
+        this.currentTilesetOptimization.imagewidth = this.outputSize;
+        this.currentTilesetOptimization.imageheight = this.outputSize;
+        this.currentTilesetOptimization.tilecount = this.currentExtractedTiles.length;
+        const tilesetBuffer = await this.generateNewTilesetBuffer(this.outputSize);
         if (this.logLevel === libGuards_1.LogLevel.VERBOSE) {
             console.log("Empty image generated");
         }
@@ -280,7 +276,7 @@ class Optimizer {
         let x = 0;
         let y = 0;
         for (const tileBuffer of tileBuffers) {
-            if (x === imageSize) {
+            if (x === this.outputSize) {
                 y += this.tileSize;
                 x = 0;
             }
@@ -291,7 +287,10 @@ class Optimizer {
             });
             x += this.tileSize;
         }
-        this.optimizedTilesets.set(this.currentTilesetOptimization, await sharpTileset.composite(sharpComposites).toBuffer());
+        await sharpTileset
+            .composite(sharpComposites)
+            .toFile(`${this.outputPath}/${this.currentTilesetOptimization.image}`);
+        this.optimizedTilesets.push(this.currentTilesetOptimization);
         if (this.logLevel === libGuards_1.LogLevel.VERBOSE) {
             console.log("Tileset optimized image generated");
         }

@@ -85,7 +85,7 @@ const optimize = async (mapFilePath, options = undefined) => {
     if (logLevel) {
         console.log(`${mapName} map file render in progress!`);
     }
-    await fs_1.default.promises.writeFile(`${outputPath}/${outputMapName}`, JSON.stringify(map, null, 0)).then(() => {
+    await fs_1.default.promises.writeFile(`${outputPath}/${outputMapName}`, JSON.stringify(map, null, 2)).then(() => {
         console.log(`${mapName} map file rendered!`);
     });
 };

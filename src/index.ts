@@ -74,7 +74,7 @@ export const optimize = async (
         console.log(`${mapName} map file render in progress!`);
     }
 
-    await fs.promises.writeFile(`${outputPath}/${outputMapName}`, JSON.stringify(map, null, 0)).then(() => {
+    await fs.promises.writeFile(`${outputPath}/${outputMapName}`, JSON.stringify(map, null, 2)).then(() => {
         console.log(`${mapName} map file rendered!`);
     });
 };

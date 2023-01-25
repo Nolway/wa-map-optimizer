@@ -29,7 +29,8 @@ export class Optimizer {
         this.optimizedTilesets = [];
         this.tileSize = options?.tile?.size ?? 32;
         this.outputSize = options?.output?.tileset?.size ? options?.output?.tileset?.size : 512;
-        this.tilesetMaxTileCount = (this.outputSize * this.outputSize) / this.tileSize;
+        const maxColumns = this.outputSize / 32;
+        this.tilesetMaxTileCount = maxColumns * maxColumns;
         this.tilesetPrefix = options?.output?.tileset?.prefix ?? "chunk";
         this.tilesetSuffix = options?.output?.tileset?.suffix;
         this.logLevel = options?.logs ?? LogLevel.NORMAL;
@@ -307,12 +308,14 @@ export class Optimizer {
             console.log(`Rendering of ${this.currentTilesetOptimization.name} tileset...`);
         }
 
-        this.currentTilesetOptimization.columns = Math.floor(this.outputSize / this.tileSize);
-        this.currentTilesetOptimization.imagewidth = this.outputSize;
-        this.currentTilesetOptimization.imageheight = this.outputSize;
         this.currentTilesetOptimization.tilecount = this.currentExtractedTiles.length;
+        const columnCount = Math.ceil(Math.sqrt(this.currentTilesetOptimization.tilecount));
+        const imageSize = columnCount * this.tileSize;
+        this.currentTilesetOptimization.columns = columnCount;
+        this.currentTilesetOptimization.imagewidth = imageSize;
+        this.currentTilesetOptimization.imageheight = imageSize;
 
-        const tilesetBuffer = await this.generateNewTilesetBuffer(this.outputSize);
+        const tilesetBuffer = await this.generateNewTilesetBuffer(imageSize);
 
         if (this.logLevel === LogLevel.VERBOSE) {
             console.log("Empty image generated");
@@ -337,7 +340,7 @@ export class Optimizer {
         let y = 0;
 
         for (const tileBuffer of tileBuffers) {
-            if (x === this.outputSize) {
+            if (x === imageSize) {
                 y += this.tileSize;
                 x = 0;
             }

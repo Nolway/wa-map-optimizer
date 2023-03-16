@@ -27,11 +27,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.optimize = void 0;
+const tiled_map_type_guard_1 = require("@workadventure/tiled-map-type-guard");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importStar(require("path"));
 const sharp_1 = __importDefault(require("sharp"));
 const libGuards_1 = require("./guards/libGuards");
-const mapGuards_1 = require("./guards/mapGuards");
 const Optimizer_1 = require("./Optimizer");
 async function getMap(mapFilePath) {
     let mapFile;
@@ -41,7 +41,7 @@ async function getMap(mapFilePath) {
     catch (err) {
         throw Error(`Cannot get the map file: ${err}`);
     }
-    const isRealMap = mapGuards_1.isMap.passthrough().safeParse(JSON.parse(mapFile.toString("utf-8")));
+    const isRealMap = tiled_map_type_guard_1.ITiledMap.passthrough().safeParse(JSON.parse(mapFile.toString("utf-8")));
     if (!isRealMap.success) {
         console.error(isRealMap.error.issues);
         throw Error("Bad format on map file");
@@ -59,6 +59,9 @@ const optimize = async (mapFilePath, options = undefined) => {
         console.log(`${mapName} optimization is started!`);
     }
     for (const tileset of map.tilesets) {
+        if (!("image" in tileset)) {
+            throw new Error(`${tileset.source} isn't embed on ${mapFilePath} map`);
+        }
         try {
             const { data, info } = await (0, sharp_1.default)((0, path_1.resolve)(`${mapDirectoryPath}/${tileset.image}`))
                 .raw()

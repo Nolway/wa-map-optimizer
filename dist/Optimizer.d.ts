@@ -1,6 +1,6 @@
+import { ITiledMap, ITiledMapEmbeddedTileset } from "@workadventure/tiled-map-type-guard";
 import { Sharp } from "sharp";
 import { LogLevel } from "./guards/libGuards";
-import { Map as MapFormat, MapTileset } from "./guards/mapGuards";
 export declare class Optimizer {
     private readonly tilesetsBuffers;
     private readonly outputPath;
@@ -15,7 +15,7 @@ export declare class Optimizer {
     private tilesetPrefix;
     private tilesetSuffix?;
     private logLevel;
-    constructor(map: MapFormat, tilesetsBuffers: Map<MapTileset, Sharp>, options: {
+    constructor(map: ITiledMap, tilesetsBuffers: Map<ITiledMapEmbeddedTileset, Sharp>, options: {
         tile?: {
             size?: number | undefined;
         } | undefined;
@@ -28,7 +28,7 @@ export declare class Optimizer {
             } | undefined;
         } | undefined;
     } | undefined, outputPath: string);
-    optimize(): Promise<MapFormat>;
+    optimize(): Promise<ITiledMap>;
     private optimizeLayers;
     private generateNextTileset;
     private generateNewTilesetBuffer;

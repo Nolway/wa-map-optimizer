@@ -1,15 +1,20 @@
+import {
+    ITiledMap,
+    ITiledMapEmbeddedTileset,
+    ITiledMapLayer,
+    ITiledMapTile,
+} from "@workadventure/tiled-map-type-guard";
 import { PNG } from "pngjs";
 import sharp, { Sharp } from "sharp";
 import { LogLevel, OptimizeBufferOptions } from "./guards/libGuards";
-import { Map as MapFormat, MapLayer, MapTileset, MapTilesetTile } from "./guards/mapGuards";
 
 sharp.cache(false);
 
 export class Optimizer {
-    private optimizedMap: MapFormat;
+    private optimizedMap: ITiledMap;
     private optimizedTiles: Map<number, number>;
-    private optimizedTilesets: MapTileset[];
-    private currentTilesetOptimization: MapTileset;
+    private optimizedTilesets: ITiledMapEmbeddedTileset[];
+    private currentTilesetOptimization: ITiledMapEmbeddedTileset;
     private currentExtractedTiles: Promise<Buffer>[];
     private tileSize: number;
     private outputSize: number;
@@ -19,8 +24,8 @@ export class Optimizer {
     private logLevel: LogLevel;
 
     constructor(
-        map: MapFormat,
-        private readonly tilesetsBuffers: Map<MapTileset, Sharp>,
+        map: ITiledMap,
+        private readonly tilesetsBuffers: Map<ITiledMapEmbeddedTileset, Sharp>,
         options: OptimizeBufferOptions | undefined = undefined,
         private readonly outputPath: string
     ) {
@@ -45,7 +50,7 @@ export class Optimizer {
         }
     }
 
-    public async optimize(): Promise<MapFormat> {
+    public async optimize(): Promise<ITiledMap> {
         if (this.logLevel) {
             console.log("Start tiles optimization...");
         }
@@ -67,7 +72,7 @@ export class Optimizer {
         return this.optimizedMap;
     }
 
-    private async optimizeLayers(layers: MapLayer[]): Promise<void> {
+    private async optimizeLayers(layers: ITiledMapLayer[]): Promise<void> {
         for (let i = 0; i < layers.length; i++) {
             const layer = layers[i];
 
@@ -89,6 +94,10 @@ export class Optimizer {
             }
 
             for (let y = 0; y < layer.data.length; y++) {
+                if (typeof layer.data === "string") {
+                    continue;
+                }
+
                 const tileId = layer.data[y];
 
                 if (tileId === 0) {
@@ -97,14 +106,14 @@ export class Optimizer {
 
                 await this.checkCurrentTileset();
 
-                const newTileId = this.optimizeNewTile(tileId);
+                const newTileId = this.optimizeNewTile(Number(tileId));
 
                 layer.data[y] = newTileId;
             }
         }
     }
 
-    private generateNextTileset(): MapTileset {
+    private generateNextTileset(): ITiledMapEmbeddedTileset {
         if (this.logLevel === LogLevel.VERBOSE) {
             console.log("Generate a new tileset data");
         }
@@ -184,9 +193,17 @@ export class Optimizer {
             return existantNewTileId + minBitId;
         }
 
-        let oldTileset: MapTileset | undefined;
+        let oldTileset: ITiledMapEmbeddedTileset | undefined;
 
         for (const tileset of this.tilesetsBuffers.keys()) {
+            if (!tileset.firstgid) {
+                throw new Error(`firstgid property is undefined on ${tileset.name} tileset`);
+            }
+
+            if (!tileset.tilecount) {
+                throw new Error(`tilecount property is undefined on ${tileset.name} tileset`);
+            }
+
             if (tileset.firstgid <= unflippedTileId && tileset.firstgid + tileset.tilecount > unflippedTileId) {
                 oldTileset = tileset;
                 break;
@@ -205,9 +222,13 @@ export class Optimizer {
 
         this.optimizedTiles.set(unflippedTileId, newTileId);
 
-        let newTileData: MapTilesetTile | undefined = undefined;
+        let newTileData: ITiledMapTile | undefined = undefined;
 
         this.currentExtractedTiles.push(this.extractTile(oldTileset, unflippedTileId));
+
+        if (!oldTileset.firstgid) {
+            throw new Error(`firstgid property is undefined on ${oldTileset.name} tileset`);
+        }
 
         const oldTileIdInTileset = unflippedTileId - oldTileset.firstgid;
         const newTileIdInTileset = this.currentExtractedTiles.length - 1;
@@ -264,15 +285,27 @@ export class Optimizer {
         return newTileId + minBitId;
     }
 
-    private async extractTile(tileset: MapTileset, tileId: number): Promise<Buffer> {
-        const tileSizeSpaced = this.tileSize + tileset.spacing;
-        const tilesetColumns = Math.floor((tileset.imagewidth - tileset.margin + tileset.spacing) / tileSizeSpaced);
+    private async extractTile(tileset: ITiledMapEmbeddedTileset, tileId: number): Promise<Buffer> {
+        if (!tileset.imagewidth) {
+            throw new Error(`imagewidth property is undefined on ${tileset.name} tileset`);
+        }
+
+        if (!tileset.firstgid) {
+            throw new Error(`firstgid property is undefined on ${tileset.name} tileset`);
+        }
+
+        const tileSizeSpaced = this.tileSize + (tileset.spacing || 0);
+        const tilesetColumns = Math.floor(
+            (tileset.imagewidth - (tileset.margin || 0) + (tileset.spacing || 0)) / tileSizeSpaced
+        );
         const tilesetTileId = tileId - tileset.firstgid + 1;
 
         const estimateLeft = tilesetTileId <= tilesetColumns ? tilesetTileId : tilesetTileId % tilesetColumns;
         const leftStartPoint =
-            (estimateLeft === 0 ? tilesetColumns : estimateLeft) * tileSizeSpaced - tileSizeSpaced + tileset.margin;
-        let topStartPoint = tileset.margin;
+            (estimateLeft === 0 ? tilesetColumns : estimateLeft) * tileSizeSpaced -
+            tileSizeSpaced +
+            (tileset.margin || 0);
+        let topStartPoint = tileset.margin || 0;
         let state = tilesetTileId;
 
         while (state > tilesetColumns) {

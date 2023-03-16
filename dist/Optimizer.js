@@ -75,12 +75,15 @@ class Optimizer {
                 continue;
             }
             for (let y = 0; y < layer.data.length; y++) {
+                if (typeof layer.data === "string") {
+                    continue;
+                }
                 const tileId = layer.data[y];
                 if (tileId === 0) {
                     continue;
                 }
                 await this.checkCurrentTileset();
-                const newTileId = this.optimizeNewTile(tileId);
+                const newTileId = this.optimizeNewTile(Number(tileId));
                 layer.data[y] = newTileId;
             }
         }
@@ -163,6 +166,12 @@ class Optimizer {
         }
         let oldTileset;
         for (const tileset of this.tilesetsBuffers.keys()) {
+            if (!tileset.firstgid) {
+                throw new Error(`firstgid property is undefined on ${tileset.name} tileset`);
+            }
+            if (!tileset.tilecount) {
+                throw new Error(`tilecount property is undefined on ${tileset.name} tileset`);
+            }
             if (tileset.firstgid <= unflippedTileId && tileset.firstgid + tileset.tilecount > unflippedTileId) {
                 oldTileset = tileset;
                 break;
@@ -179,6 +188,9 @@ class Optimizer {
         this.optimizedTiles.set(unflippedTileId, newTileId);
         let newTileData = undefined;
         this.currentExtractedTiles.push(this.extractTile(oldTileset, unflippedTileId));
+        if (!oldTileset.firstgid) {
+            throw new Error(`firstgid property is undefined on ${oldTileset.name} tileset`);
+        }
         const oldTileIdInTileset = unflippedTileId - oldTileset.firstgid;
         const newTileIdInTileset = this.currentExtractedTiles.length - 1;
         if (oldTileset.properties) {
@@ -222,12 +234,20 @@ class Optimizer {
         return newTileId + minBitId;
     }
     async extractTile(tileset, tileId) {
-        const tileSizeSpaced = this.tileSize + tileset.spacing;
-        const tilesetColumns = Math.floor((tileset.imagewidth - tileset.margin + tileset.spacing) / tileSizeSpaced);
+        if (!tileset.imagewidth) {
+            throw new Error(`imagewidth property is undefined on ${tileset.name} tileset`);
+        }
+        if (!tileset.firstgid) {
+            throw new Error(`firstgid property is undefined on ${tileset.name} tileset`);
+        }
+        const tileSizeSpaced = this.tileSize + (tileset.spacing || 0);
+        const tilesetColumns = Math.floor((tileset.imagewidth - (tileset.margin || 0) + (tileset.spacing || 0)) / tileSizeSpaced);
         const tilesetTileId = tileId - tileset.firstgid + 1;
         const estimateLeft = tilesetTileId <= tilesetColumns ? tilesetTileId : tilesetTileId % tilesetColumns;
-        const leftStartPoint = (estimateLeft === 0 ? tilesetColumns : estimateLeft) * tileSizeSpaced - tileSizeSpaced + tileset.margin;
-        let topStartPoint = tileset.margin;
+        const leftStartPoint = (estimateLeft === 0 ? tilesetColumns : estimateLeft) * tileSizeSpaced -
+            tileSizeSpaced +
+            (tileset.margin || 0);
+        let topStartPoint = tileset.margin || 0;
         let state = tilesetTileId;
         while (state > tilesetColumns) {
             state -= tilesetColumns;

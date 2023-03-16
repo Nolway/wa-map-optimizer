@@ -48,6 +48,7 @@ class Optimizer {
             console.log("Start tiles optimization...");
         }
         await this.optimizeLayers(this.optimizedMap.layers);
+        await this.optimizeNamedTiles();
         await this.currentTilesetRendering();
         this.optimizedMap.tilesets = [];
         for (const currentTileset of this.optimizedTilesets) {
@@ -83,8 +84,30 @@ class Optimizer {
                     continue;
                 }
                 await this.checkCurrentTileset();
-                const newTileId = this.optimizeNewTile(Number(tileId));
+                const newTileId = await this.optimizeNewTile(Number(tileId));
                 layer.data[y] = newTileId;
+            }
+        }
+    }
+    async optimizeNamedTiles() {
+        for (const tileset of this.tilesetsBuffers.keys()) {
+            if (!tileset.tiles) {
+                continue;
+            }
+            if (!tileset.firstgid) {
+                throw new Error(`firstgid property is undefined on ${tileset.name} tileset`);
+            }
+            for (const tile of tileset.tiles) {
+                const tileId = tileset.firstgid + tile.id;
+                if (this.optimizedTiles.has(tileId)) {
+                    continue;
+                }
+                if (!tile.properties) {
+                    continue;
+                }
+                if (tile.properties.find((property) => property.name === "name")) {
+                    await this.optimizeNewTile(tileId);
+                }
             }
         }
     }
@@ -116,7 +139,7 @@ class Optimizer {
         });
         return await newFile.pack().pipe((0, sharp_1.default)()).toBuffer();
     }
-    optimizeNewTile(tileId) {
+    async optimizeNewTile(tileId) {
         if (this.logLevel === libGuards_1.LogLevel.VERBOSE) {
             console.log(`${tileId} tile is optimizing...`);
         }
@@ -187,11 +210,23 @@ class Optimizer {
         const newTileId = this.optimizedTiles.size + 1;
         this.optimizedTiles.set(unflippedTileId, newTileId);
         let newTileData = undefined;
-        this.currentExtractedTiles.push(this.extractTile(oldTileset, unflippedTileId));
         if (!oldTileset.firstgid) {
             throw new Error(`firstgid property is undefined on ${oldTileset.name} tileset`);
         }
-        const oldTileIdInTileset = unflippedTileId - oldTileset.firstgid;
+        const oldFirstgid = oldTileset.firstgid;
+        const oldTileIdInTileset = unflippedTileId - oldFirstgid;
+        let tileData = undefined;
+        if (oldTileset.tiles) {
+            tileData = oldTileset.tiles.find((tile) => tile.id === oldTileIdInTileset);
+            if (tileData && tileData.animation) {
+                const animationTilesNotAnalyzeYet = tileData.animation.filter((animation) => !this.optimizedTiles.has(oldFirstgid + animation.tileid));
+                if (animationTilesNotAnalyzeYet.length + this.currentExtractedTiles.length >=
+                    this.tilesetMaxTileCount) {
+                    await this.currentTilesetRendering();
+                }
+            }
+        }
+        this.currentExtractedTiles.push(this.extractTile(oldTileset, unflippedTileId));
         const newTileIdInTileset = this.currentExtractedTiles.length - 1;
         if (oldTileset.properties) {
             newTileData = {
@@ -203,7 +238,6 @@ class Optimizer {
         if (!oldTileset.tiles) {
             return newTileId + minBitId;
         }
-        const tileData = oldTileset.tiles.find((tile) => tile.id === oldTileIdInTileset);
         if (!tileData) {
             return newTileId + minBitId;
         }
@@ -228,10 +262,7 @@ class Optimizer {
                     });
                     continue;
                 }
-                const newAnimationId = this.optimizeNewTile(oldTileset.firstgid + frame.tileid);
-                if (!newAnimationId) {
-                    throw new Error("Oops! An anmiation was beetween 2 tilesets, please modify the tileset output sizes");
-                }
+                this.optimizeNewTile(oldFirstgid + frame.tileid);
                 newTileData.animation.push({
                     duration: frame.duration,
                     tileid: this.currentExtractedTiles.length - 1,

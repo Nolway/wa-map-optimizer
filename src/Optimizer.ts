@@ -57,6 +57,8 @@ export class Optimizer {
 
         await this.optimizeLayers(this.optimizedMap.layers);
 
+        await this.optimizeNamedTiles();
+
         await this.currentTilesetRendering();
 
         this.optimizedMap.tilesets = [];
@@ -106,9 +108,37 @@ export class Optimizer {
 
                 await this.checkCurrentTileset();
 
-                const newTileId = this.optimizeNewTile(Number(tileId));
+                const newTileId = await this.optimizeNewTile(Number(tileId));
 
                 layer.data[y] = newTileId;
+            }
+        }
+    }
+
+    private async optimizeNamedTiles(): Promise<void> {
+        for (const tileset of this.tilesetsBuffers.keys()) {
+            if (!tileset.tiles) {
+                continue;
+            }
+
+            if (!tileset.firstgid) {
+                throw new Error(`firstgid property is undefined on ${tileset.name} tileset`);
+            }
+
+            for (const tile of tileset.tiles) {
+                const tileId = tileset.firstgid + tile.id;
+
+                if (this.optimizedTiles.has(tileId)) {
+                    continue;
+                }
+
+                if (!tile.properties) {
+                    continue;
+                }
+
+                if (tile.properties.find((property) => property.name === "name")) {
+                    await this.optimizeNewTile(tileId);
+                }
             }
         }
     }
@@ -145,7 +175,7 @@ export class Optimizer {
         return await newFile.pack().pipe(sharp()).toBuffer();
     }
 
-    private optimizeNewTile(tileId: number): number {
+    private async optimizeNewTile(tileId: number): Promise<number> {
         if (this.logLevel === LogLevel.VERBOSE) {
             console.log(`${tileId} tile is optimizing...`);
         }
@@ -224,13 +254,34 @@ export class Optimizer {
 
         let newTileData: ITiledMapTile | undefined = undefined;
 
-        this.currentExtractedTiles.push(this.extractTile(oldTileset, unflippedTileId));
-
         if (!oldTileset.firstgid) {
             throw new Error(`firstgid property is undefined on ${oldTileset.name} tileset`);
         }
 
-        const oldTileIdInTileset = unflippedTileId - oldTileset.firstgid;
+        const oldFirstgid = oldTileset.firstgid;
+        const oldTileIdInTileset = unflippedTileId - oldFirstgid;
+
+        let tileData: ITiledMapTile | undefined = undefined;
+
+        if (oldTileset.tiles) {
+            tileData = oldTileset.tiles.find((tile) => tile.id === oldTileIdInTileset);
+
+            if (tileData && tileData.animation) {
+                const animationTilesNotAnalyzeYet = tileData.animation.filter(
+                    (animation) => !this.optimizedTiles.has(oldFirstgid + animation.tileid)
+                );
+
+                if (
+                    animationTilesNotAnalyzeYet.length + this.currentExtractedTiles.length >=
+                    this.tilesetMaxTileCount
+                ) {
+                    await this.currentTilesetRendering();
+                }
+            }
+        }
+
+        this.currentExtractedTiles.push(this.extractTile(oldTileset, unflippedTileId));
+
         const newTileIdInTileset = this.currentExtractedTiles.length - 1;
 
         if (oldTileset.properties) {
@@ -244,8 +295,6 @@ export class Optimizer {
         if (!oldTileset.tiles) {
             return newTileId + minBitId;
         }
-
-        const tileData = oldTileset.tiles.find((tile) => tile.id === oldTileIdInTileset);
 
         if (!tileData) {
             return newTileId + minBitId;
@@ -275,13 +324,7 @@ export class Optimizer {
                     continue;
                 }
 
-                const newAnimationId = this.optimizeNewTile(oldTileset.firstgid + frame.tileid);
-
-                if (!newAnimationId) {
-                    throw new Error(
-                        "Oops! An anmiation was beetween 2 tilesets, please modify the tileset output sizes"
-                    );
-                }
+                this.optimizeNewTile(oldFirstgid + frame.tileid);
 
                 newTileData.animation.push({
                     duration: frame.duration,

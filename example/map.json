@@ -101,7 +101,7 @@
     "nextobjectid": 3,
     "orientation": "orthogonal",
     "renderorder": "right-down",
-    "tiledversion": "1.8.4",
+    "tiledversion": "1.9.2",
     "tileheight": 32,
     "tilesets": [
         {
@@ -420,12 +420,27 @@
                     ]
                 },
                 {
+                    "animation": [
+                        {
+                            "duration": 700,
+                            "tileid": 35
+                        },
+                        {
+                            "duration": 700,
+                            "tileid": 46
+                        }
+                    ],
                     "id": 35,
                     "properties": [
                         {
                             "name": "collides",
                             "type": "bool",
                             "value": true
+                        },
+                        {
+                            "name": "name",
+                            "type": "string",
+                            "value": "computer screen"
                         }
                     ]
                 },
@@ -721,6 +736,6 @@
     ],
     "tilewidth": 32,
     "type": "map",
-    "version": "1.8",
+    "version": "1.9",
     "width": 10
 }

@@ -30,6 +30,7 @@ export declare class Optimizer {
     } | undefined, outputPath: string);
     optimize(): Promise<ITiledMap>;
     private optimizeLayers;
+    private optimizeNamedTiles;
     private generateNextTileset;
     private generateNewTilesetBuffer;
     private optimizeNewTile;

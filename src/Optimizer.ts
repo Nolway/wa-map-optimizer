@@ -267,6 +267,14 @@ export class Optimizer {
         if (tileData.animation) {
             newTileData.animation = [];
             for (const frame of tileData.animation) {
+                if (frame.tileid === 0) {
+                    newTileData.animation.push({
+                        duration: frame.duration,
+                        tileid: 0,
+                    });
+                    continue;
+                }
+
                 const newAnimationId = this.optimizeNewTile(oldTileset.firstgid + frame.tileid);
 
                 if (!newAnimationId) {

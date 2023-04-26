@@ -248,12 +248,6 @@ export class Optimizer {
             return 0;
         }
 
-        const newTileId = this.optimizedTiles.size + 1;
-
-        this.optimizedTiles.set(unflippedTileId, newTileId);
-
-        let newTileData: ITiledMapTile | undefined = undefined;
-
         if (!oldTileset.firstgid) {
             throw new Error(`firstgid property is undefined on ${oldTileset.name} tileset`);
         }
@@ -267,18 +261,21 @@ export class Optimizer {
             tileData = oldTileset.tiles.find((tile) => tile.id === oldTileIdInTileset);
 
             if (tileData && tileData.animation) {
-                const animationTilesNotAnalyzeYet = tileData.animation.filter(
-                    (animation) => !this.optimizedTiles.has(oldFirstgid + animation.tileid)
-                );
+                if (tileData.animation.length + this.currentExtractedTiles.length > this.tilesetMaxTileCount) {
+                    for (let i = 1; i < this.tilesetMaxTileCount - this.currentExtractedTiles.length; i++) {
+                        this.optimizedTiles.set(-1, this.optimizedTiles.size + i);
+                    }
 
-                if (
-                    animationTilesNotAnalyzeYet.length + this.currentExtractedTiles.length >=
-                    this.tilesetMaxTileCount
-                ) {
                     await this.currentTilesetRendering();
                 }
             }
         }
+
+        const newTileId = this.optimizedTiles.size + 1;
+
+        this.optimizedTiles.set(unflippedTileId, newTileId);
+
+        let newTileData: ITiledMapTile | undefined = undefined;
 
         this.currentExtractedTiles.push(this.extractTile(oldTileset, unflippedTileId));
 
@@ -316,14 +313,6 @@ export class Optimizer {
         if (tileData.animation) {
             newTileData.animation = [];
             for (const frame of tileData.animation) {
-                if (frame.tileid === 0) {
-                    newTileData.animation.push({
-                        duration: frame.duration,
-                        tileid: 0,
-                    });
-                    continue;
-                }
-
                 this.optimizeNewTile(oldFirstgid + frame.tileid);
 
                 newTileData.animation.push({

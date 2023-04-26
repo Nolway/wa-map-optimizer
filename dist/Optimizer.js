@@ -207,9 +207,6 @@ class Optimizer {
             }
             return 0;
         }
-        const newTileId = this.optimizedTiles.size + 1;
-        this.optimizedTiles.set(unflippedTileId, newTileId);
-        let newTileData = undefined;
         if (!oldTileset.firstgid) {
             throw new Error(`firstgid property is undefined on ${oldTileset.name} tileset`);
         }
@@ -219,13 +216,17 @@ class Optimizer {
         if (oldTileset.tiles) {
             tileData = oldTileset.tiles.find((tile) => tile.id === oldTileIdInTileset);
             if (tileData && tileData.animation) {
-                const animationTilesNotAnalyzeYet = tileData.animation.filter((animation) => !this.optimizedTiles.has(oldFirstgid + animation.tileid));
-                if (animationTilesNotAnalyzeYet.length + this.currentExtractedTiles.length >=
-                    this.tilesetMaxTileCount) {
+                if (tileData.animation.length + this.currentExtractedTiles.length > this.tilesetMaxTileCount) {
+                    for (let i = 1; i < this.tilesetMaxTileCount - this.currentExtractedTiles.length; i++) {
+                        this.optimizedTiles.set(-1, this.optimizedTiles.size + i);
+                    }
                     await this.currentTilesetRendering();
                 }
             }
         }
+        const newTileId = this.optimizedTiles.size + 1;
+        this.optimizedTiles.set(unflippedTileId, newTileId);
+        let newTileData = undefined;
         this.currentExtractedTiles.push(this.extractTile(oldTileset, unflippedTileId));
         const newTileIdInTileset = this.currentExtractedTiles.length - 1;
         if (oldTileset.properties) {
@@ -255,13 +256,6 @@ class Optimizer {
         if (tileData.animation) {
             newTileData.animation = [];
             for (const frame of tileData.animation) {
-                if (frame.tileid === 0) {
-                    newTileData.animation.push({
-                        duration: frame.duration,
-                        tileid: 0,
-                    });
-                    continue;
-                }
                 this.optimizeNewTile(oldFirstgid + frame.tileid);
                 newTileData.animation.push({
                     duration: frame.duration,

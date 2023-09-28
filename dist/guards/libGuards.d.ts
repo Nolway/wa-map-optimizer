@@ -116,14 +116,27 @@ declare const isOptimizeOptions: z.ZodObject<z.extendShape<{
             prefix: z.ZodOptional<z.ZodString>;
             suffix: z.ZodOptional<z.ZodString>;
             size: z.ZodOptional<z.ZodNumber>;
+            compress: z.ZodOptional<z.ZodObject<{
+                quality: z.ZodOptional<z.ZodTuple<[z.ZodNumber, z.ZodNumber], null>>;
+            }, "strip", z.ZodTypeAny, {
+                quality?: [number, number] | undefined;
+            }, {
+                quality?: [number, number] | undefined;
+            }>>;
         }, "strip", z.ZodTypeAny, {
             size?: number | undefined;
             prefix?: string | undefined;
             suffix?: string | undefined;
+            compress?: {
+                quality?: [number, number] | undefined;
+            } | undefined;
         }, {
             size?: number | undefined;
             prefix?: string | undefined;
             suffix?: string | undefined;
+            compress?: {
+                quality?: [number, number] | undefined;
+            } | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
         path?: string | undefined;
@@ -134,6 +147,9 @@ declare const isOptimizeOptions: z.ZodObject<z.extendShape<{
             size?: number | undefined;
             prefix?: string | undefined;
             suffix?: string | undefined;
+            compress?: {
+                quality?: [number, number] | undefined;
+            } | undefined;
         } | undefined;
     }, {
         path?: string | undefined;
@@ -144,6 +160,9 @@ declare const isOptimizeOptions: z.ZodObject<z.extendShape<{
             size?: number | undefined;
             prefix?: string | undefined;
             suffix?: string | undefined;
+            compress?: {
+                quality?: [number, number] | undefined;
+            } | undefined;
         } | undefined;
     }>>;
 }>, "strip", z.ZodTypeAny, {
@@ -160,6 +179,9 @@ declare const isOptimizeOptions: z.ZodObject<z.extendShape<{
             size?: number | undefined;
             prefix?: string | undefined;
             suffix?: string | undefined;
+            compress?: {
+                quality?: [number, number] | undefined;
+            } | undefined;
         } | undefined;
     } | undefined;
 }, {
@@ -176,6 +198,9 @@ declare const isOptimizeOptions: z.ZodObject<z.extendShape<{
             size?: number | undefined;
             prefix?: string | undefined;
             suffix?: string | undefined;
+            compress?: {
+                quality?: [number, number] | undefined;
+            } | undefined;
         } | undefined;
     } | undefined;
 }>;

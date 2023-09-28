@@ -33,6 +33,8 @@ const path_1 = __importStar(require("path"));
 const sharp_1 = __importDefault(require("sharp"));
 const libGuards_1 = require("./guards/libGuards");
 const Optimizer_1 = require("./Optimizer");
+const imagemin_1 = __importDefault(require("imagemin"));
+const imagemin_pngquant_1 = __importDefault(require("imagemin-pngquant"));
 async function getMap(mapFilePath) {
     let mapFile;
     try {
@@ -84,6 +86,22 @@ const optimize = async (mapFilePath, options = undefined) => {
     }
     const optimizer = new Optimizer_1.Optimizer(map, tilesets, options, outputPath);
     await optimizer.optimize();
+    if (options?.output?.tileset?.compress) {
+        console.log("Compressing tileset files...");
+        const files = await (0, imagemin_1.default)([`${outputPath}/*.png`], {
+            destination: outputPath,
+            plugins: [
+                (0, imagemin_pngquant_1.default)({
+                    quality: options.output.tileset.compress.quality,
+                    strip: true,
+                }),
+            ],
+        });
+        for (const file of files) {
+            await fs_1.default.promises.writeFile(file.destinationPath, file.data);
+        }
+        console.log("Tileset files compressed!");
+    }
     const outputMapName = (options?.output?.map?.name ?? mapName) + mapExtension;
     if (logLevel) {
         console.log(`${mapName} map file render in progress!`);

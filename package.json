@@ -1,6 +1,6 @@
 {
     "name": "wa-map-optimizer",
-    "version": "1.3.6",
+    "version": "1.4.0",
     "description": "WorkAdventure Map Optimizer! Does your map need a diet?",
     "main": "./dist/index.js",
     "repository": "https://github.com/nolway/wa-map-optimizer",
@@ -19,11 +19,14 @@
     },
     "dependencies": {
         "@workadventure/tiled-map-type-guard": "^2.1.1",
+        "imagemin": "^7.0.1",
+        "imagemin-pngquant": "^9.0.2",
         "pngjs": "^6.0.0",
         "sharp": "^0.30.4",
         "zod": "^3.20.2"
     },
     "devDependencies": {
+        "@types/imagemin": "^7.0.1",
         "@types/node": "^18.11.18",
         "@types/pngjs": "^6.0.1",
         "@types/sharp": "^0.30.2",

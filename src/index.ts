@@ -4,6 +4,8 @@ import path, { resolve } from "path";
 import sharp, { Sharp } from "sharp";
 import { LogLevel, OptimizeOptions } from "./guards/libGuards";
 import { Optimizer } from "./Optimizer";
+import imagemin from "imagemin";
+import imageminPngquant from "imagemin-pngquant";
 
 async function getMap(mapFilePath: string): Promise<ITiledMap> {
     let mapFile;
@@ -71,6 +73,26 @@ export const optimize = async (
 
     const optimizer = new Optimizer(map, tilesets, options, outputPath);
     await optimizer.optimize();
+
+    if (options?.output?.tileset?.compress) {
+        console.log("Compressing tileset files...");
+
+        const files = await imagemin([`${outputPath}/*.png`], {
+            destination: outputPath,
+            plugins: [
+                imageminPngquant({
+                    quality: options.output.tileset.compress.quality,
+                    strip: true,
+                }),
+            ],
+        });
+
+        for (const file of files) {
+            await fs.promises.writeFile(file.destinationPath, file.data);
+        }
+
+        console.log("Tileset files compressed!");
+    }
 
     const outputMapName = (options?.output?.map?.name ?? mapName) + mapExtension;
 

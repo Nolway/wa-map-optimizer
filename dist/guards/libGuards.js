@@ -42,6 +42,11 @@ const isOptimizeOptions = isOptimizeBufferOptions.extend({
             prefix: zod_1.z.string().optional(),
             suffix: zod_1.z.string().optional(),
             size: zod_1.z.number().gte(32).multipleOf(8).optional(),
+            compress: zod_1.z
+                .object({
+                quality: zod_1.z.tuple([zod_1.z.number().gte(0).lte(1), zod_1.z.number().gte(0).lte(1)]).optional(),
+            })
+                .optional(),
         })
             .optional(),
     })

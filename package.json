@@ -10,23 +10,24 @@
     "files": [
         "/dist"
     ],
+    "type": "module",
     "scripts": {
         "prepare": "husky install",
         "build": "tsc --build",
         "lint": "eslint --ext .js,.ts .",
         "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
-        "dev": "ts-node ./example/index.ts"
+        "dev": "ts-node-esm --experimental-specifier-resolution=node ./example/index.ts"
     },
     "dependencies": {
         "@workadventure/tiled-map-type-guard": "^2.1.1",
-        "imagemin": "^7.0.1",
+        "imagemin": "^8.0.1",
         "imagemin-pngquant": "^9.0.2",
         "pngjs": "^6.0.0",
         "sharp": "^0.30.4",
         "zod": "^3.20.2"
     },
     "devDependencies": {
-        "@types/imagemin": "^7.0.1",
+        "@types/imagemin": "^8.0.1",
         "@types/node": "^18.11.18",
         "@types/pngjs": "^6.0.1",
         "@types/sharp": "^0.30.2",

@@ -1,14 +1,8 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Optimizer = void 0;
-const pngjs_1 = require("pngjs");
-const sharp_1 = __importDefault(require("sharp"));
-const libGuards_1 = require("./guards/libGuards");
-sharp_1.default.cache(false);
-class Optimizer {
+import { PNG } from "pngjs";
+import sharp from "sharp";
+import { LogLevel } from "./guards/libGuards";
+sharp.cache(false);
+export class Optimizer {
     tilesetsBuffers;
     outputPath;
     optimizedMap;
@@ -34,7 +28,7 @@ class Optimizer {
         this.tilesetMaxTileCount = maxColumns * maxColumns;
         this.tilesetPrefix = options?.output?.tileset?.prefix ?? "chunk";
         this.tilesetSuffix = options?.output?.tileset?.suffix;
-        this.logLevel = options?.logs ?? libGuards_1.LogLevel.NORMAL;
+        this.logLevel = options?.logs ?? LogLevel.NORMAL;
         this.currentTilesetOptimization = this.generateNextTileset();
         this.currentExtractedTiles = [];
         for (const tileset of [...tilesetsBuffers.keys()]) {
@@ -112,7 +106,7 @@ class Optimizer {
         }
     }
     generateNextTileset() {
-        if (this.logLevel === libGuards_1.LogLevel.VERBOSE) {
+        if (this.logLevel === LogLevel.VERBOSE) {
             console.log("Generate a new tileset data");
         }
         const tilesetCount = this.optimizedTilesets.length + 1;
@@ -133,14 +127,14 @@ class Optimizer {
         };
     }
     async generateNewTilesetBuffer(size) {
-        const newFile = new pngjs_1.PNG({
+        const newFile = new PNG({
             width: size,
             height: size,
         });
-        return await newFile.pack().pipe((0, sharp_1.default)()).toBuffer();
+        return await newFile.pack().pipe(sharp()).toBuffer();
     }
     async optimizeNewTile(tileId) {
-        if (this.logLevel === libGuards_1.LogLevel.VERBOSE) {
+        if (this.logLevel === LogLevel.VERBOSE) {
             console.log(`${tileId} tile is optimizing...`);
         }
         let minBitId;
@@ -315,15 +309,15 @@ class Optimizer {
         this.currentTilesetOptimization.imagewidth = imageSize;
         this.currentTilesetOptimization.imageheight = imageSize;
         const tilesetBuffer = await this.generateNewTilesetBuffer(imageSize);
-        if (this.logLevel === libGuards_1.LogLevel.VERBOSE) {
+        if (this.logLevel === LogLevel.VERBOSE) {
             console.log("Empty image generated");
         }
-        const sharpTileset = (0, sharp_1.default)(tilesetBuffer);
-        if (this.logLevel === libGuards_1.LogLevel.VERBOSE) {
+        const sharpTileset = sharp(tilesetBuffer);
+        if (this.logLevel === LogLevel.VERBOSE) {
             console.log("Loading of all tiles who will be optimized...");
         }
         const tileBuffers = await Promise.all(this.currentExtractedTiles);
-        if (this.logLevel === libGuards_1.LogLevel.VERBOSE) {
+        if (this.logLevel === LogLevel.VERBOSE) {
             console.log("Tiles loading finished");
             console.log("Tileset optimized image generating...");
         }
@@ -346,7 +340,7 @@ class Optimizer {
             .composite(sharpComposites)
             .toFile(`${this.outputPath}/${this.currentTilesetOptimization.image}`);
         this.optimizedTilesets.push(this.currentTilesetOptimization);
-        if (this.logLevel === libGuards_1.LogLevel.VERBOSE) {
+        if (this.logLevel === LogLevel.VERBOSE) {
             console.log("Tileset optimized image generated");
         }
         if (this.logLevel) {
@@ -356,4 +350,3 @@ class Optimizer {
         this.currentExtractedTiles = [];
     }
 }
-exports.Optimizer = Optimizer;

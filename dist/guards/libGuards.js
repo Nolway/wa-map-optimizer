@@ -1,50 +1,47 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.LogLevel = void 0;
-const zod_1 = require("zod");
-var LogLevel;
+import { z } from "zod";
+export var LogLevel;
 (function (LogLevel) {
     LogLevel[LogLevel["NONE"] = 0] = "NONE";
     LogLevel[LogLevel["NORMAL"] = 1] = "NORMAL";
     LogLevel[LogLevel["VERBOSE"] = 2] = "VERBOSE";
-})(LogLevel = exports.LogLevel || (exports.LogLevel = {}));
-const isLogLevel = zod_1.z.nativeEnum(LogLevel);
-const isOptimizeBufferOptions = zod_1.z.object({
-    tile: zod_1.z
+})(LogLevel || (LogLevel = {}));
+const isLogLevel = z.nativeEnum(LogLevel);
+const isOptimizeBufferOptions = z.object({
+    tile: z
         .object({
-        size: zod_1.z.number().positive().optional(),
+        size: z.number().positive().optional(),
     })
         .optional(),
     logs: isLogLevel.optional(),
-    output: zod_1.z
+    output: z
         .object({
-        tileset: zod_1.z
+        tileset: z
             .object({
-            prefix: zod_1.z.string().optional(),
-            suffix: zod_1.z.string().optional(),
-            size: zod_1.z.number().gte(32).multipleOf(8).optional(),
+            prefix: z.string().optional(),
+            suffix: z.string().optional(),
+            size: z.number().gte(32).multipleOf(8).optional(),
         })
             .optional(),
     })
         .optional(),
 });
 const isOptimizeOptions = isOptimizeBufferOptions.extend({
-    output: zod_1.z
+    output: z
         .object({
-        map: zod_1.z
+        map: z
             .object({
-            name: zod_1.z.string().optional(),
+            name: z.string().optional(),
         })
             .optional(),
-        path: zod_1.z.string().optional(),
-        tileset: zod_1.z
+        path: z.string().optional(),
+        tileset: z
             .object({
-            prefix: zod_1.z.string().optional(),
-            suffix: zod_1.z.string().optional(),
-            size: zod_1.z.number().gte(32).multipleOf(8).optional(),
-            compress: zod_1.z
+            prefix: z.string().optional(),
+            suffix: z.string().optional(),
+            size: z.number().gte(32).multipleOf(8).optional(),
+            compress: z
                 .object({
-                quality: zod_1.z.tuple([zod_1.z.number().gte(0).lte(1), zod_1.z.number().gte(0).lte(1)]).optional(),
+                quality: z.tuple([z.number().gte(0).lte(1), z.number().gte(0).lte(1)]).optional(),
             })
                 .optional(),
         })

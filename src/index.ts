@@ -75,9 +75,11 @@ export const optimize = async (
     await optimizer.optimize();
 
     if (options?.output?.tileset?.compress) {
-        console.log("Compressing tileset files...");
+        if (logLevel) {
+            console.log("Compressing tileset files...");
+        }
 
-        const files = await imagemin([`${outputPath}/*.png`], {
+        const files = await imagemin([`${outputPath}/*chunk*.png`], {
             destination: outputPath,
             plugins: [
                 imageminPngquant({
@@ -88,10 +90,20 @@ export const optimize = async (
         });
 
         for (const file of files) {
+            if (logLevel) {
+                console.log(`Compressing ${file.destinationPath}...`);
+            }
+
             await fs.promises.writeFile(file.destinationPath, file.data);
+
+            if (logLevel) {
+                console.log(`${file.destinationPath} compressed!`);
+            }
         }
 
-        console.log("Tileset files compressed!");
+        if (logLevel) {
+            console.log("Tileset files compressed!");
+        }
     }
 
     const outputMapName = (options?.output?.map?.name ?? mapName) + mapExtension;

@@ -1,62 +1,33 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.optimize = void 0;
-const tiled_map_type_guard_1 = require("@workadventure/tiled-map-type-guard");
-const fs_1 = __importDefault(require("fs"));
-const path_1 = __importStar(require("path"));
-const sharp_1 = __importDefault(require("sharp"));
-const libGuards_1 = require("./guards/libGuards");
-const Optimizer_1 = require("./Optimizer");
-const imagemin_1 = __importDefault(require("imagemin"));
-const imagemin_pngquant_1 = __importDefault(require("imagemin-pngquant"));
+import { ITiledMap } from "@workadventure/tiled-map-type-guard";
+import fs from "fs";
+import path, { resolve } from "path";
+import sharp from "sharp";
+import { LogLevel } from "./guards/libGuards";
+import { Optimizer } from "./Optimizer";
+import imagemin from "imagemin";
+import imageminPngquant from "imagemin-pngquant";
 async function getMap(mapFilePath) {
     let mapFile;
     try {
-        mapFile = await fs_1.default.promises.readFile(mapFilePath);
+        mapFile = await fs.promises.readFile(mapFilePath);
     }
     catch (err) {
         throw Error(`Cannot get the map file: ${err}`);
     }
-    const isRealMap = tiled_map_type_guard_1.ITiledMap.passthrough().safeParse(JSON.parse(mapFile.toString("utf-8")));
+    const isRealMap = ITiledMap.passthrough().safeParse(JSON.parse(mapFile.toString("utf-8")));
     if (!isRealMap.success) {
         console.error(isRealMap.error.issues);
         throw Error("Bad format on map file");
     }
     return isRealMap.data;
 }
-const optimize = async (mapFilePath, options = undefined) => {
+export const optimize = async (mapFilePath, options = undefined) => {
     const map = await getMap(mapFilePath);
-    const mapDirectoryPath = (0, path_1.resolve)(mapFilePath.substring(0, mapFilePath.lastIndexOf("/")));
+    const mapDirectoryPath = resolve(mapFilePath.substring(0, mapFilePath.lastIndexOf("/")));
     const tilesets = new Map();
-    const mapName = path_1.default.parse(mapFilePath).name;
-    const mapExtension = path_1.default.parse(mapFilePath).ext;
-    const logLevel = options?.logs ?? libGuards_1.LogLevel.NORMAL;
+    const mapName = path.parse(mapFilePath).name;
+    const mapExtension = path.parse(mapFilePath).ext;
+    const logLevel = options?.logs ?? LogLevel.NORMAL;
     if (logLevel) {
         console.log(`${mapName} optimization is started!`);
     }
@@ -65,10 +36,10 @@ const optimize = async (mapFilePath, options = undefined) => {
             throw new Error(`${tileset.source} isn't embed on ${mapFilePath} map`);
         }
         try {
-            const { data, info } = await (0, sharp_1.default)((0, path_1.resolve)(`${mapDirectoryPath}/${tileset.image}`))
+            const { data, info } = await sharp(resolve(`${mapDirectoryPath}/${tileset.image}`))
                 .raw()
                 .toBuffer({ resolveWithObject: true });
-            tilesets.set(tileset, (0, sharp_1.default)(new Uint8ClampedArray(data.buffer), {
+            tilesets.set(tileset, sharp(new Uint8ClampedArray(data.buffer), {
                 raw: {
                     width: info.width,
                     height: info.height,
@@ -81,33 +52,42 @@ const optimize = async (mapFilePath, options = undefined) => {
         }
     }
     const outputPath = options?.output?.path ?? `${mapDirectoryPath}/dist`;
-    if (!fs_1.default.existsSync(outputPath)) {
-        fs_1.default.mkdirSync(outputPath, { recursive: true });
+    if (!fs.existsSync(outputPath)) {
+        fs.mkdirSync(outputPath, { recursive: true });
     }
-    const optimizer = new Optimizer_1.Optimizer(map, tilesets, options, outputPath);
+    const optimizer = new Optimizer(map, tilesets, options, outputPath);
     await optimizer.optimize();
     if (options?.output?.tileset?.compress) {
-        console.log("Compressing tileset files...");
-        const files = await (0, imagemin_1.default)([`${outputPath}/*.png`], {
+        if (logLevel) {
+            console.log("Compressing tileset files...");
+        }
+        const files = await imagemin([`${outputPath}/*chunk*.png`], {
             destination: outputPath,
             plugins: [
-                (0, imagemin_pngquant_1.default)({
+                imageminPngquant({
                     quality: options.output.tileset.compress.quality,
                     strip: true,
                 }),
             ],
         });
         for (const file of files) {
-            await fs_1.default.promises.writeFile(file.destinationPath, file.data);
+            if (logLevel) {
+                console.log(`Compressing ${file.destinationPath}...`);
+            }
+            await fs.promises.writeFile(file.destinationPath, file.data);
+            if (logLevel) {
+                console.log(`${file.destinationPath} compressed!`);
+            }
         }
-        console.log("Tileset files compressed!");
+        if (logLevel) {
+            console.log("Tileset files compressed!");
+        }
     }
     const outputMapName = (options?.output?.map?.name ?? mapName) + mapExtension;
     if (logLevel) {
         console.log(`${mapName} map file render in progress!`);
     }
-    await fs_1.default.promises.writeFile(`${outputPath}/${outputMapName}`, JSON.stringify(map, null, 2)).then(() => {
+    await fs.promises.writeFile(`${outputPath}/${outputMapName}`, JSON.stringify(map, null, 2)).then(() => {
         console.log(`${mapName} map file rendered!`);
     });
 };
-exports.optimize = optimize;

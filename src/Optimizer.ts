@@ -286,14 +286,19 @@ export class Optimizer {
                 id: newTileIdInTileset,
                 properties: [...oldTileset.properties],
             };
-            this.currentTilesetOptimization.tiles?.push(newTileData);
         }
 
         if (!oldTileset.tiles) {
+            if (newTileData) {
+                this.currentTilesetOptimization.tiles?.push(newTileData);
+            }
             return newTileId + minBitId;
         }
 
         if (!tileData) {
+            if (newTileData) {
+                this.currentTilesetOptimization.tiles?.push(newTileData);
+            }
             return newTileId + minBitId;
         }
 

@@ -6,7 +6,7 @@ import {
 } from "@workadventure/tiled-map-type-guard";
 import { PNG } from "pngjs";
 import sharp, { Sharp } from "sharp";
-import { LogLevel, OptimizeBufferOptions } from "./guards/libGuards";
+import { LogLevel, OptimizeBufferOptions } from "./guards/libGuards.js";
 
 sharp.cache(false);
 

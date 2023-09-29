@@ -1,6 +1,6 @@
 import { ITiledMap, ITiledMapEmbeddedTileset } from "@workadventure/tiled-map-type-guard";
 import { Sharp } from "sharp";
-import { LogLevel } from "./guards/libGuards";
+import { LogLevel } from "./guards/libGuards.js";
 export declare class Optimizer {
     private readonly tilesetsBuffers;
     private readonly outputPath;
@@ -22,9 +22,9 @@ export declare class Optimizer {
         logs?: LogLevel | undefined;
         output?: {
             tileset?: {
-                size?: number | undefined;
                 prefix?: string | undefined;
                 suffix?: string | undefined;
+                size?: number | undefined;
             } | undefined;
         } | undefined;
     } | undefined, outputPath: string);

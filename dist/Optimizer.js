@@ -1,6 +1,6 @@
 import { PNG } from "pngjs";
 import sharp from "sharp";
-import { LogLevel } from "./guards/libGuards";
+import { LogLevel } from "./guards/libGuards.js";
 sharp.cache(false);
 export class Optimizer {
     tilesetsBuffers;

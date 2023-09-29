@@ -2,8 +2,8 @@ import { ITiledMap } from "@workadventure/tiled-map-type-guard";
 import fs from "fs";
 import path, { resolve } from "path";
 import sharp from "sharp";
-import { LogLevel } from "./guards/libGuards";
-import { Optimizer } from "./Optimizer";
+import { LogLevel } from "./guards/libGuards.js";
+import { Optimizer } from "./Optimizer.js";
 import imagemin from "imagemin";
 import imageminPngquant from "imagemin-pngquant";
 async function getMap(mapFilePath) {

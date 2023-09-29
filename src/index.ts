@@ -2,8 +2,8 @@ import { ITiledMap, ITiledMapEmbeddedTileset } from "@workadventure/tiled-map-ty
 import fs from "fs";
 import path, { resolve } from "path";
 import sharp, { Sharp } from "sharp";
-import { LogLevel, OptimizeOptions } from "./guards/libGuards";
-import { Optimizer } from "./Optimizer";
+import { LogLevel, OptimizeOptions } from "./guards/libGuards.js";
+import { Optimizer } from "./Optimizer.js";
 import imagemin from "imagemin";
 import imageminPngquant from "imagemin-pngquant";
 

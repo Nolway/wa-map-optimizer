@@ -61,7 +61,9 @@ export const optimize = async (mapFilePath, options = undefined) => {
         if (logLevel) {
             console.log("Compressing tileset files...");
         }
-        const files = await imagemin([`${outputPath}/*chunk*.png`], {
+        const tilesetPrefix = options?.output?.tileset?.prefix ?? "chunk";
+        const tilesetSuffix = options?.output?.tileset?.suffix;
+        const files = await imagemin([`${outputPath}/${tilesetPrefix}-*${tilesetSuffix ? "-" + tilesetSuffix : ""}.png`], {
             destination: outputPath,
             plugins: [
                 imageminPngquant({

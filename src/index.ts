@@ -79,15 +79,21 @@ export const optimize = async (
             console.log("Compressing tileset files...");
         }
 
-        const files = await imagemin([`${outputPath}/*chunk*.png`], {
-            destination: outputPath,
-            plugins: [
-                imageminPngquant({
-                    quality: options.output.tileset.compress.quality,
-                    strip: true,
-                }),
-            ],
-        });
+        const tilesetPrefix = options?.output?.tileset?.prefix ?? "chunk";
+        const tilesetSuffix = options?.output?.tileset?.suffix;
+
+        const files = await imagemin(
+            [`${outputPath}/${tilesetPrefix}-*${tilesetSuffix ? "-" + tilesetSuffix : ""}.png`],
+            {
+                destination: outputPath,
+                plugins: [
+                    imageminPngquant({
+                        quality: options.output.tileset.compress.quality,
+                        strip: true,
+                    }),
+                ],
+            }
+        );
 
         for (const file of files) {
             if (logLevel) {

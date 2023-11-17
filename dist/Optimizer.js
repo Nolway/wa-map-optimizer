@@ -251,6 +251,7 @@ export class Optimizer {
             newTileData.properties
                 ? newTileData.properties.push(...tileData.properties)
                 : (newTileData.properties = [...tileData.properties]);
+            this.currentTilesetOptimization.tiles?.push(newTileData);
         }
         if (tileData.animation) {
             newTileData.animation = [];

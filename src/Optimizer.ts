@@ -15,7 +15,7 @@ export class Optimizer {
     private optimizedTiles: Map<number, number>;
     private optimizedTilesets: ITiledMapEmbeddedTileset[];
     private currentTilesetOptimization: ITiledMapEmbeddedTileset;
-    private currentExtractedTiles: Promise<Buffer>[];
+    private currentExtractedTiles: Sharp[];
     private tileSize: number;
     private outputSize: number;
     private tilesetMaxTileCount: number;
@@ -166,13 +166,13 @@ export class Optimizer {
         };
     }
 
-    private async generateNewTilesetBuffer(size: number): Promise<Buffer> {
+    private generateNewTilesetBuffer(size: number): Sharp {
         const newFile = new PNG({
             width: size,
             height: size,
         });
 
-        return await newFile.pack().pipe(sharp()).toBuffer();
+        return newFile.pack().pipe(sharp());
     }
 
     private async optimizeNewTile(tileId: number): Promise<number> {
@@ -331,7 +331,7 @@ export class Optimizer {
         return newTileId + minBitId;
     }
 
-    private async extractTile(tileset: ITiledMapEmbeddedTileset, tileId: number): Promise<Buffer> {
+    private extractTile(tileset: ITiledMapEmbeddedTileset, tileId: number): Sharp {
         if (!tileset.imagewidth) {
             throw new Error(`imagewidth property is undefined on ${tileset.name} tileset`);
         }
@@ -365,14 +365,13 @@ export class Optimizer {
             throw new Error("Undefined sharp object");
         }
 
-        return await sharpObject
+        return sharpObject.clone()
             .extract({
                 left: leftStartPoint,
                 top: topStartPoint,
                 width: this.tileSize,
                 height: this.tileSize,
-            })
-            .toBuffer();
+            });
     }
 
     private async checkCurrentTileset(): Promise<void> {
@@ -394,19 +393,17 @@ export class Optimizer {
         this.currentTilesetOptimization.imagewidth = imageSize;
         this.currentTilesetOptimization.imageheight = imageSize;
 
-        const tilesetBuffer = await this.generateNewTilesetBuffer(imageSize);
+        const sharpTileset = this.generateNewTilesetBuffer(imageSize);
 
         if (this.logLevel === LogLevel.VERBOSE) {
             console.log("Empty image generated");
         }
 
-        const sharpTileset = sharp(tilesetBuffer);
-
         if (this.logLevel === LogLevel.VERBOSE) {
             console.log("Loading of all tiles who will be optimized...");
         }
 
-        const tileBuffers = await Promise.all(this.currentExtractedTiles);
+        const tileBuffers = await Promise.all(this.currentExtractedTiles.map((tile) => tile.toBuffer()));
 
         if (this.logLevel === LogLevel.VERBOSE) {
             console.log("Tiles loading finished");

@@ -59,7 +59,9 @@ export class Optimizer {
 
         await this.optimizeNamedTiles();
 
-        await this.currentTilesetRendering();
+        if (this.currentExtractedTiles.length > 0) {
+            await this.currentTilesetRendering();
+        }
 
         this.optimizedMap.tilesets = [];
 

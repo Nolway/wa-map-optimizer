@@ -179,7 +179,7 @@ export class Optimizer {
 
     private async optimizeNewTile(tileId: number): Promise<number> {
         if (this.logLevel === LogLevel.VERBOSE) {
-            console.log(`${tileId} tile is optimizing...`);
+            //console.log(`${tileId} tile is optimizing...`);
         }
 
         let minBitId;
@@ -321,7 +321,7 @@ export class Optimizer {
         if (tileData.animation) {
             newTileData.animation = [];
             for (const frame of tileData.animation) {
-                this.optimizeNewTile(oldFirstgid + frame.tileid);
+                await this.optimizeNewTile(oldFirstgid + frame.tileid);
 
                 newTileData.animation.push({
                     duration: frame.duration,

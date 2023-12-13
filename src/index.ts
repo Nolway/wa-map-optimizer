@@ -13,7 +13,7 @@ async function getMap(mapFilePath: string): Promise<ITiledMap> {
     try {
         mapFile = await fs.promises.readFile(mapFilePath);
     } catch (err) {
-        throw Error(`Cannot get the map file: ${err}`);
+        throw Error(`Cannot get the map file: ${err instanceof Error ? err.message : "unknown error"}`);
     }
     const isRealMap = ITiledMap.passthrough().safeParse(JSON.parse(mapFile.toString("utf-8")));
 

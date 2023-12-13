@@ -14,6 +14,7 @@
     "scripts": {
         "prepare": "husky install",
         "build": "tsc --build",
+        "typecheck": "tsc --noEmit",
         "lint": "eslint --ext .js,.ts .",
         "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
         "dev": "node --loader ts-node/esm --experimental-specifier-resolution=node ./example/index.ts"

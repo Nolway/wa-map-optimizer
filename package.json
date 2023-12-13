@@ -1,6 +1,6 @@
 {
     "name": "wa-map-optimizer",
-    "version": "1.4.6",
+    "version": "1.4.7",
     "description": "WorkAdventure Map Optimizer! Does your map need a diet?",
     "main": "./dist/index.js",
     "repository": "https://github.com/nolway/wa-map-optimizer",

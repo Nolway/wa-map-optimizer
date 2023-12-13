@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.7](https://github.com/Nolway/wa-map-optimizer/compare/v1.4.6...v1.4.7) (2023-12-13)
+
+
+### Bug Fixes
+
+* Fixing missing await in animation generation spawning 2 tilesets ([ae57ab4](https://github.com/Nolway/wa-map-optimizer/commit/ae57ab4a4702fe771f44818dcee06d977ab80113))
+* Making it easy to run example with Node 20 ([38a98e2](https://github.com/Nolway/wa-map-optimizer/commit/38a98e2804f0cfa43568e886de5cb97ccb7cec93))
+
 ## [1.4.6](https://github.com/Nolway/wa-map-optimizer/compare/v1.4.3...v1.4.6) (2023-11-24)
 
 

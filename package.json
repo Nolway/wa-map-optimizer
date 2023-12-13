@@ -16,7 +16,7 @@
         "build": "tsc --build",
         "lint": "eslint --ext .js,.ts .",
         "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
-        "dev": "ts-node-esm --experimental-specifier-resolution=node ./example/index.ts"
+        "dev": "node --loader ts-node/esm --experimental-specifier-resolution=node ./example/index.ts"
     },
     "dependencies": {
         "@workadventure/tiled-map-type-guard": "^2.1.1",

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.8](https://github.com/Nolway/wa-map-optimizer/compare/v1.4.7...v1.4.8) (2024-06-19)
+
+
+### Bug Fixes
+
+* Fixing animation optimization issue ([74919b5](https://github.com/Nolway/wa-map-optimizer/commit/74919b5a0b583a4ddec41ee5cf0bc533a81591c3))
+
 ## [1.4.7](https://github.com/Nolway/wa-map-optimizer/compare/v1.4.6...v1.4.7) (2023-12-13)
 
 

@@ -12,7 +12,11 @@ sharp.cache(false);
 
 export class Optimizer {
     private optimizedMap: ITiledMap;
-    private optimizedTiles: Map<number, number>;
+    /**
+     * A map mapping the old tile id to the new tile id (global) and to the new tile id in the current tileset
+     * @private
+     */
+    private optimizedTiles: Map<number, { global: number; local: number }>;
     private optimizedTilesets: ITiledMapEmbeddedTileset[];
     private currentTilesetOptimization: ITiledMapEmbeddedTileset;
     private currentExtractedTiles: Promise<Buffer>[];
@@ -30,7 +34,7 @@ export class Optimizer {
         private readonly outputPath: string
     ) {
         this.optimizedMap = map;
-        this.optimizedTiles = new Map<number, number>();
+        this.optimizedTiles = new Map<number, { global: number; local: number }>();
         this.optimizedTilesets = [];
         this.tileSize = options?.tile?.size ?? 32;
         this.outputSize = options?.output?.tileset?.size ? options?.output?.tileset?.size : 512;
@@ -219,7 +223,7 @@ export class Optimizer {
 
         const unflippedTileId = tileId - minBitId;
 
-        const existantNewTileId = this.optimizedTiles.get(unflippedTileId);
+        const existantNewTileId = this.optimizedTiles.get(unflippedTileId)?.global;
 
         if (existantNewTileId) {
             return existantNewTileId + minBitId;
@@ -265,7 +269,10 @@ export class Optimizer {
             if (tileData && tileData.animation) {
                 if (tileData.animation.length + this.currentExtractedTiles.length > this.tilesetMaxTileCount) {
                     for (let i = 1; i < this.tilesetMaxTileCount - this.currentExtractedTiles.length; i++) {
-                        this.optimizedTiles.set(-1, this.optimizedTiles.size + i);
+                        this.optimizedTiles.set(-1, {
+                            global: this.optimizedTiles.size + i,
+                            local: 0,
+                        });
                     }
 
                     await this.currentTilesetRendering();
@@ -275,7 +282,10 @@ export class Optimizer {
 
         const newTileId = this.optimizedTiles.size + 1;
 
-        this.optimizedTiles.set(unflippedTileId, newTileId);
+        this.optimizedTiles.set(unflippedTileId, {
+            global: newTileId,
+            local: this.currentExtractedTiles.length,
+        });
 
         let newTileData: ITiledMapTile | undefined = undefined;
 
@@ -322,10 +332,14 @@ export class Optimizer {
             newTileData.animation = [];
             for (const frame of tileData.animation) {
                 await this.optimizeNewTile(oldFirstgid + frame.tileid);
+                const newTile = this.optimizedTiles.get(oldFirstgid + frame.tileid)?.local;
+                if (newTile === undefined) {
+                    throw new Error(`Undefined tile in animation for ${oldFirstgid + frame.tileid}`);
+                }
 
                 newTileData.animation.push({
                     duration: frame.duration,
-                    tileid: this.currentExtractedTiles.length - 1,
+                    tileid: newTile,
                 });
             }
         }
